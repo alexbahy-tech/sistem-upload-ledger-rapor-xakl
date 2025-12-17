@@ -10,42 +10,33 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: #f8fafc; }
-        
-        /* Glass Effect & Animations */
         .glass { background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-radius: 16px; }
-        .stat-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .spin-slow { animation: spin 3s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .stat-card { transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
 <body class="pb-20 bg-slate-50">
 
     <script>
-        // PASTE URL WEB APP GOOGLE SCRIPT ANDA DI SINI
-        const APP_URL = "https://script.google.com/macros/s/AKfycbyuIMaceLogLsHr5s3Y4Adnhvh9j32jGVhKzdHyMI5XyzdrQptvCijrB_GXILOHCZvu5Q/exec"; 
+        // PASTE URL WEB APP BARU ANDA DISINI
+        const APP_URL = "https://script.google.com/macros/s/AKfycbyCx59hOVIeqXDxx4HJA4IujnJ2u8fSXO0CFdcbANveiznfbULwGS3PtCF_kx4iT4ihsw/exec"; 
     </script>
 
-    <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
+    <nav class="bg-white/90 backdrop-blur border-b border-slate-200 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-600 text-white w-9 h-9 rounded-xl flex items-center justify-center font-bold shadow-lg shadow-blue-200">
-                    <i class="fa-solid fa-graduation-cap"></i>
+                <div class="bg-blue-600 text-white w-9 h-9 rounded-xl flex items-center justify-center font-bold shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-school"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-slate-800 leading-tight">Admin X AKL</h1>
-                    <p class="text-[10px] text-slate-500 font-semibold tracking-wider">MANAJEMEN RAPOR</p>
+                    <p class="text-[10px] text-slate-500 font-bold tracking-wider">DASHBOARD</p>
                 </div>
             </div>
-            
             <div class="flex gap-2">
-                <button onclick="triggerUploadLedger()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 group">
-                    <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition">
-                        <i class="fa-solid fa-file-invoice text-xs"></i>
-                    </div>
-                    <span class="hidden sm:inline">Ledger</span>
+                <button onclick="triggerUploadLedger()" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-3 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                    <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">Upload Ledger</span>
                 </button>
-
                 <button onclick="document.getElementById('modalAdd').classList.remove('hidden')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-200 flex items-center gap-2">
                     <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Siswa</span>
                 </button>
@@ -55,93 +46,98 @@
 
     <main class="max-w-6xl mx-auto px-4 py-8">
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             
-            <div class="stat-card relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-200">
-                <div class="relative z-10">
-                    <p class="text-blue-100 text-sm font-medium uppercase tracking-wider mb-1">Total Siswa</p>
-                    <h2 class="text-3xl font-bold" id="statTotal">0</h2>
-                    <p class="text-xs text-blue-200 mt-2 flex items-center gap-1">
-                        <i class="fa-solid fa-check-circle"></i> Data Terupdate
-                    </p>
+            <div class="stat-card bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg shadow-blue-200">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-blue-100 text-xs font-bold uppercase">Total Siswa</p>
+                        <h2 class="text-3xl font-bold mt-1" id="statTotal">0</h2>
+                    </div>
+                    <div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-users"></i></div>
                 </div>
-                <i class="fa-solid fa-users absolute -right-4 -bottom-4 text-8xl text-white opacity-10"></i>
             </div>
 
-            <div class="stat-card relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 text-white shadow-xl shadow-emerald-200">
-                <div class="relative z-10">
-                    <p class="text-emerald-100 text-sm font-medium uppercase tracking-wider mb-1">File Ledger</p>
-                    <h2 class="text-3xl font-bold" id="statLedger">0</h2>
-                    <p class="text-xs text-emerald-200 mt-2 flex items-center gap-1 cursor-pointer hover:underline" onclick="checkLedgerStatus()">
-                        <i class="fa-solid fa-sync"></i> Refresh Data
-                    </p>
+            <div onclick="showLedgerFiles()" class="stat-card cursor-pointer bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg shadow-emerald-200 group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-emerald-100 text-xs font-bold uppercase group-hover:underline">File Ledger</p>
+                        <h2 class="text-3xl font-bold mt-1" id="statLedger">0</h2>
+                        <p class="text-[10px] mt-1 text-emerald-100"><i class="fa-solid fa-download"></i> Klik utk Unduh</p>
+                    </div>
+                    <div class="bg-white/20 p-2 rounded-lg"><i class="fa-solid fa-file-invoice-dollar"></i></div>
                 </div>
-                <i class="fa-solid fa-file-invoice-dollar absolute -right-4 -bottom-4 text-8xl text-white opacity-10"></i>
             </div>
 
-            <div class="stat-card relative overflow-hidden rounded-2xl p-6 bg-gradient-to-br from-violet-500 via-purple-600 to-fuchsia-700 text-white shadow-xl shadow-purple-200">
-                <div class="relative z-10">
-                    <p class="text-purple-100 text-sm font-medium uppercase tracking-wider mb-1">Status Server</p>
-                    <h2 class="text-xl font-bold mt-1 flex items-center gap-2">
-                        <span id="serverStatusText">Connecting...</span>
-                        <span class="relative flex h-3 w-3">
-                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-400"></span>
-                        </span>
-                    </h2>
-                    <p class="text-xs text-purple-200 mt-3">Google Apps Script API</p>
+            <div class="stat-card bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-slate-500 text-xs font-bold uppercase">Identitas Ada</p>
+                        <h2 class="text-3xl font-bold mt-1 text-emerald-600" id="statIdentitas">0</h2>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div id="barIdentitas" class="bg-emerald-500 h-full w-0 transition-all duration-1000"></div>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-50 text-emerald-600 p-2 rounded-lg"><i class="fa-solid fa-id-card"></i></div>
                 </div>
-                <i class="fa-solid fa-server absolute -right-4 -bottom-4 text-8xl text-white opacity-10"></i>
             </div>
+
+            <div class="stat-card bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-slate-500 text-xs font-bold uppercase">Rapor Ada</p>
+                        <h2 class="text-3xl font-bold mt-1 text-purple-600" id="statRapor">0</h2>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
+                            <div id="barRapor" class="bg-purple-500 h-full w-0 transition-all duration-1000"></div>
+                        </div>
+                    </div>
+                    <div class="bg-purple-50 text-purple-600 p-2 rounded-lg"><i class="fa-solid fa-file-lines"></i></div>
+                </div>
+            </div>
+
         </div>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-            <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-list text-blue-500"></i> Daftar Siswa
-            </h3>
-            <div class="relative w-full sm:w-72">
-                <input type="text" id="search" placeholder="Cari nama atau NIS..." 
-                    class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition shadow-sm text-sm" 
+            <div class="relative w-full sm:w-1/2">
+                <input type="text" id="search" placeholder="Cari nama siswa..." 
+                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-100 outline-none text-sm" 
                     onkeyup="filterStudents()">
-                <i class="fa-solid fa-search absolute left-3 top-3 text-slate-400 text-sm"></i>
+                <i class="fa-solid fa-search absolute left-3 top-3.5 text-slate-400"></i>
             </div>
+            <button onclick="loadData()" class="text-slate-500 hover:text-blue-600 text-sm font-medium px-4 py-2 hover:bg-white rounded-lg transition"><i class="fa-solid fa-rotate-right mr-1"></i> Refresh Data</button>
         </div>
 
-        <div id="loader" class="flex flex-col items-center py-20 bg-white rounded-2xl shadow-sm border border-slate-100">
-            <div class="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-            <p class="text-slate-500 font-medium">Mengambil data dari database...</p>
+        <div id="loader" class="text-center py-20">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500 mb-4"></i>
+            <p class="text-slate-500">Memuat data...</p>
         </div>
 
-        <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 hidden">
-            </div>
+        <div id="grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 hidden"></div>
 
     </main>
 
     <input type="file" id="fileInput" class="hidden" accept=".pdf, .xls, .xlsx, .csv">
 
-    <div id="modalAdd" class="fixed inset-0 bg-slate-900/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
-        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform scale-100 transition-transform">
-            <div class="flex justify-between items-center mb-5">
-                <h3 class="font-bold text-lg text-slate-800">Tambah Siswa</h3>
-                <button onclick="document.getElementById('modalAdd').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
-                    <i class="fa-solid fa-times text-xl"></i>
-                </button>
+    <div id="modalLedger" class="fixed inset-0 bg-slate-900/50 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg text-slate-800">Download Ledger</h3>
+                <button onclick="document.getElementById('modalLedger').classList.add('hidden')" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
             </div>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">Nama Lengkap</label>
-                    <input type="text" id="newNama" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-slate-600 mb-1">NIS / NISN</label>
-                    <input type="number" id="newNis" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition">
-                </div>
+            <div id="ledgerList" class="space-y-2 max-h-60 overflow-y-auto">
+                <p class="text-center text-slate-400 py-4">Memuat file...</p>
             </div>
+        </div>
+    </div>
 
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="document.getElementById('modalAdd').classList.add('hidden')" class="px-5 py-2.5 text-slate-500 font-medium hover:bg-slate-50 rounded-xl transition">Batal</button>
-                <button onclick="addStudent()" class="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition">Simpan</button>
+    <div id="modalAdd" class="fixed inset-0 bg-slate-900/50 z-[70] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="font-bold text-lg mb-4">Tambah Siswa</h3>
+            <input type="text" id="newNama" placeholder="Nama Lengkap" class="w-full mb-3 px-4 py-3 border rounded-xl text-sm">
+            <input type="number" id="newNis" placeholder="NIS" class="w-full mb-4 px-4 py-3 border rounded-xl text-sm">
+            <div class="flex justify-end gap-2">
+                <button onclick="document.getElementById('modalAdd').classList.add('hidden')" class="px-4 py-2 text-slate-500 hover:bg-slate-50 rounded-xl">Batal</button>
+                <button onclick="addStudent()" class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">Simpan</button>
             </div>
         </div>
     </div>
@@ -150,98 +146,127 @@
         let allData = [];
         let uploadType = ''; 
         let currentUploadFolder = "";
-        let currentCardId = "";
+        let currentRow = null;
 
-        // --- INIT ---
         window.onload = function() {
             loadData();
-            checkLedgerStatus(); // Cek statistik ledger saat start
+            checkLedgerCount();
         };
 
         async function loadData() {
-            if(APP_URL.includes("CONTOH")) {
-                Swal.fire("Konfigurasi Diperlukan", "Silakan edit file index.html dan masukkan URL Web App Anda.", "warning");
-                return;
-            }
-
+            if(APP_URL.includes("CONTOH")) { Swal.fire("Error", "URL Web App belum diisi!", "error"); return; }
+            
             try {
-                const res = await fetch(APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'read' })
-                });
+                const res = await fetch(APP_URL, { method: 'POST', body: JSON.stringify({ action: 'read' }) });
                 const data = await res.json();
                 
-                // Update Statistik
-                document.getElementById('statTotal').innerText = data.length || 0;
-                document.getElementById('serverStatusText').innerText = "Online";
-                
                 allData = data;
+                updateStats(data);
                 renderData(data);
+                
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('grid').classList.remove('hidden');
-            } catch (err) {
-                document.getElementById('serverStatusText').innerText = "Offline";
-                document.getElementById('loader').innerHTML = `<p class="text-red-500">Gagal terhubung ke server.</p>`;
-                console.error(err);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // --- CEK STATUS LEDGER KHUSUS ---
-        async function checkLedgerStatus() {
+        function updateStats(data) {
+            const total = data.length;
+            const identitasCount = data.filter(s => s.hasIdentitas).length;
+            const raporCount = data.filter(s => s.hasRapor).length;
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statIdentitas').innerText = identitasCount;
+            document.getElementById('statRapor').innerText = raporCount;
+
+            // Update Progress Bars
+            setTimeout(() => {
+                document.getElementById('barIdentitas').style.width = (total > 0 ? (identitasCount/total)*100 : 0) + "%";
+                document.getElementById('barRapor').style.width = (total > 0 ? (raporCount/total)*100 : 0) + "%";
+            }, 500);
+        }
+
+        async function checkLedgerCount() {
             try {
-                // Menggunakan keyword "LEDGER" yang sudah disupport backend baru
-                const response = await fetch(`${APP_URL}?action=checkStatus&folderId=LEDGER`);
-                const res = await response.json();
-                
-                if(res.status === 'success') {
-                    // Update angka di kartu statistik tengah
-                    document.getElementById('statLedger').innerText = res.totalFiles || 0;
+                const res = await fetch(`${APP_URL}?action=checkStatus&folderId=LEDGER`);
+                const result = await res.json();
+                if(result.status === 'success') {
+                    document.getElementById('statLedger').innerText = result.totalFiles;
                 }
+            } catch(e){}
+        }
+
+        // --- FITUR BARU: LIHAT & DOWNLOAD LEDGER ---
+        async function showLedgerFiles() {
+            document.getElementById('modalLedger').classList.remove('hidden');
+            const listContainer = document.getElementById('ledgerList');
+            listContainer.innerHTML = `<div class="flex justify-center py-4"><i class="fa-solid fa-circle-notch fa-spin text-blue-500"></i></div>`;
+
+            try {
+                const res = await fetch(`${APP_URL}?action=checkStatus&folderId=LEDGER`);
+                const result = await res.json();
+
+                listContainer.innerHTML = "";
+                if(result.files.length === 0) {
+                    listContainer.innerHTML = `<p class="text-center text-slate-400 py-4">Tidak ada file Ledger.</p>`;
+                    return;
+                }
+
+                result.files.forEach(f => {
+                    listContainer.innerHTML += `
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-file-excel"></i></div>
+                                <span class="text-sm font-medium text-slate-700 truncate">${f.name}</span>
+                            </div>
+                            <a href="${f.url}" target="_blank" class="text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 flex items-center gap-1 shadow-md shadow-emerald-200">
+                                <i class="fa-solid fa-download"></i> Unduh
+                            </a>
+                        </div>
+                    `;
+                });
             } catch(e) {
-                console.log("Gagal cek ledger stat");
+                listContainer.innerHTML = `<p class="text-red-500 text-center">Gagal memuat list.</p>`;
             }
         }
 
-        // --- RENDER GRID SISWA ---
         function renderData(data) {
             const grid = document.getElementById('grid');
             grid.innerHTML = "";
-            
-            if(data.length === 0) {
-                grid.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-10 opacity-50"><i class="fa-solid fa-folder-open text-4xl mb-2"></i><p>Belum ada data siswa.</p></div>`;
-                return;
-            }
+            if(data.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-10 opacity-50">Data kosong</div>`; return; }
 
             data.forEach(s => {
+                // Status Badge Logic
+                const idClass = s.hasIdentitas ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-400";
+                const idText = s.hasIdentitas ? "TERISI" : "KOSONG";
+                
+                const rapClass = s.hasRapor ? "bg-purple-100 text-purple-700" : "bg-slate-100 text-slate-400";
+                const rapText = s.hasRapor ? "TERISI" : "KOSONG";
+
                 const card = document.createElement('div');
                 card.className = "glass p-5 relative group flex flex-col h-full";
                 card.id = `card-${s.row}`;
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
-                                ${s.no || '#'}
-                            </div>
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm shadow-inner">${s.no}</div>
                             <div>
                                 <h2 class="font-bold text-slate-800 text-lg leading-tight line-clamp-1">${s.nama}</h2>
                                 <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wide">NIS: ${s.nis}</span>
                             </div>
                         </div>
-                        <button onclick="deleteStudent(${s.row})" class="w-8 h-8 rounded-full hover:bg-red-50 text-slate-300 hover:text-red-500 transition flex items-center justify-center">
-                            <i class="fa-solid fa-trash-alt text-sm"></i>
-                        </button>
+                        <button onclick="deleteStudent(${s.row})" class="w-8 h-8 rounded-full hover:bg-red-50 text-slate-300 hover:text-red-500 transition flex items-center justify-center"><i class="fa-solid fa-trash-alt text-sm"></i></button>
                     </div>
 
                     <div class="space-y-3 mb-5 flex-grow" id="status-area-${s.row}">
                         <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-xs font-semibold text-slate-500 flex items-center gap-2"><i class="fa-solid fa-id-card text-blue-400"></i> Identitas</span>
-                            <span class="badge-identitas text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-0.5 rounded-md">?</span>
+                            <span class="text-xs font-semibold text-slate-500 flex items-center gap-2"><i class="fa-solid fa-id-card text-emerald-500"></i> Identitas</span>
+                            <span id="badge-id-${s.row}" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${idClass}">${idText}</span>
                         </div>
                         <div class="flex justify-between items-center p-2.5 bg-slate-50 rounded-xl border border-slate-100">
-                            <span class="text-xs font-semibold text-slate-500 flex items-center gap-2"><i class="fa-solid fa-file-lines text-purple-400"></i> Rapor</span>
-                            <span class="badge-rapor text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-0.5 rounded-md">?</span>
+                            <span class="text-xs font-semibold text-slate-500 flex items-center gap-2"><i class="fa-solid fa-file-lines text-purple-500"></i> Rapor</span>
+                            <span id="badge-rap-${s.row}" class="text-[10px] font-bold px-2 py-0.5 rounded-md ${rapClass}">${rapText}</span>
                         </div>
-                        <div id="links-${s.row}" class="hidden mt-2 space-y-1"></div>
+                        <div id="links-${s.row}" class="hidden space-y-1 mt-2"></div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 mt-auto pt-4 border-t border-slate-100">
@@ -257,43 +282,41 @@
             });
         }
 
-        // --- CHECK STATUS PER SISWA ---
+        // --- CHECK PER SISWA (Mengupdate UI + Sheet) ---
         async function checkStatus(folderId, rowId) {
             const btn = document.querySelector(`#card-${rowId} .btn-check i`);
             btn.classList.add('fa-spin');
             
             try {
-                const response = await fetch(`${APP_URL}?action=checkStatus&folderId=${folderId}`);
+                // Kirim rowId agar backend bisa update spreadsheet
+                const response = await fetch(`${APP_URL}?action=checkStatus&folderId=${folderId}&row=${rowId}`);
                 const res = await response.json();
                 
                 btn.classList.remove('fa-spin');
                 
-                const card = document.getElementById(`card-${rowId}`);
-                const idBadge = card.querySelector('.badge-identitas');
-                const rapBadge = card.querySelector('.badge-rapor');
+                // Update Badges UI Secara Langsung
+                const idBadge = document.getElementById(`badge-id-${rowId}`);
+                const rapBadge = document.getElementById(`badge-rap-${rowId}`);
+                
+                if(res.hasIdentitas) {
+                    idBadge.innerText = "TERISI"; idBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700";
+                } else {
+                    idBadge.innerText = "KOSONG"; idBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-400";
+                }
+
+                if(res.hasRapor) {
+                    rapBadge.innerText = "TERISI"; rapBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-100 text-purple-700";
+                } else {
+                    rapBadge.innerText = "KOSONG"; rapBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-400";
+                }
+
+                // Tampilkan Link
                 const linksDiv = document.getElementById(`links-${rowId}`);
-
-                // Update UI Badges
-                const activeClass = "text-[10px] font-bold px-2 py-0.5 rounded-md text-emerald-700 bg-emerald-100";
-                const emptyClass = "text-[10px] font-bold px-2 py-0.5 rounded-md text-rose-700 bg-rose-100";
-
-                idBadge.innerText = res.hasIdentitas ? "TERISI" : "KOSONG";
-                idBadge.className = `badge-identitas ${res.hasIdentitas ? activeClass : emptyClass}`;
-
-                rapBadge.innerText = res.hasRapor ? "TERISI" : "KOSONG";
-                rapBadge.className = `badge-rapor ${res.hasRapor ? activeClass : emptyClass}`;
-
-                // Update Links
                 linksDiv.innerHTML = '';
                 if(res.files && res.files.length > 0) {
                     linksDiv.classList.remove('hidden');
                     res.files.forEach(f => {
-                        const a = document.createElement('a');
-                        a.href = f.url;
-                        a.target = '_blank';
-                        a.className = "flex items-center gap-2 text-xs text-blue-600 hover:text-blue-800 hover:underline truncate bg-blue-50 px-2 py-1 rounded-lg";
-                        a.innerHTML = `<i class="fa-solid fa-external-link-alt text-[10px]"></i> ${f.name}`;
-                        linksDiv.appendChild(a);
+                        linksDiv.innerHTML += `<a href="${f.url}" target="_blank" class="block text-xs text-blue-600 hover:underline bg-blue-50 px-2 py-1 rounded truncate"><i class="fa-solid fa-link mr-1"></i> ${f.name}</a>`;
                     });
                 } else {
                     linksDiv.classList.add('hidden');
@@ -301,22 +324,17 @@
 
             } catch (e) {
                 console.error(e);
-                Swal.fire("Gagal", "Tidak dapat memeriksa folder.", "error");
                 btn.classList.remove('fa-spin');
             }
         }
 
-        // --- LOGIKA UPLOAD (STUDENT & LEDGER) ---
+        // --- LOGIKA UPLOAD (Dengan Update Status Otomatis) ---
         function triggerUploadStudent(folderId, rowId) {
-            uploadType = 'student';
-            currentUploadFolder = folderId;
-            currentCardId = rowId;
+            uploadType = 'student'; currentUploadFolder = folderId; currentRow = rowId;
             document.getElementById('fileInput').click();
         }
-
         function triggerUploadLedger() {
-            uploadType = 'ledger';
-            currentUploadFolder = "LEDGER"; 
+            uploadType = 'ledger'; currentUploadFolder = "LEDGER";
             document.getElementById('fileInput').click();
         }
 
@@ -325,129 +343,78 @@
             if(!file) return;
 
             let fileName = file.name;
-            let options = {};
-
             if (uploadType === 'student') {
                 const { value: name } = await Swal.fire({
                     title: 'Upload File Siswa',
                     input: 'text',
-                    inputLabel: 'Nama File (Harus mengandung "rapor" atau "identitas")',
+                    inputLabel: 'Nama file (Wajib mengandung "rapor" atau "identitas")',
                     inputValue: file.name,
-                    showCancelButton: true,
-                    confirmButtonColor: '#2563eb'
+                    showCancelButton: true
                 });
                 if(!name) { this.value = ''; return; }
                 fileName = name;
-
             } else {
-                const { isConfirmed } = await Swal.fire({
-                    title: 'Upload Ledger',
-                    text: `File akan disimpan ke folder pusat data: ${file.name}`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, Upload',
-                    confirmButtonColor: '#059669'
-                });
+                const { isConfirmed } = await Swal.fire({title: 'Upload Ledger?', text: file.name, icon:'question', showCancelButton:true});
                 if(!isConfirmed) { this.value = ''; return; }
             }
 
-            // Proses Upload
             const reader = new FileReader();
             reader.onload = async function(evt) {
                 const base64 = evt.target.result.split(',')[1];
-                
-                Swal.fire({
-                    title: 'Sedang Mengupload...',
-                    html: 'Mohon jangan tutup halaman ini.',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
+                Swal.fire({title: 'Uploading...', didOpen: () => Swal.showLoading()});
 
                 try {
-                    const payload = {
-                        action: 'upload',
-                        folderId: currentUploadFolder,
-                        fileName: fileName,
-                        mimeType: file.type,
-                        fileData: base64
-                    };
-
+                    // Kirim row agar backend bisa update status
                     const res = await fetch(APP_URL, {
                         method: 'POST',
-                        body: JSON.stringify(payload)
+                        body: JSON.stringify({
+                            action: 'upload',
+                            folderId: currentUploadFolder,
+                            row: currentRow, 
+                            fileName: fileName,
+                            mimeType: file.type,
+                            fileData: base64
+                        })
                     });
                     const result = await res.json();
-
                     if(result.status === 'success') {
-                        Swal.fire('Berhasil!', 'File berhasil disimpan.', 'success');
+                        Swal.fire('Berhasil!', 'File tersimpan.', 'success');
+                        if(uploadType === 'student') checkStatus(currentUploadFolder, currentRow);
+                        else checkLedgerCount();
                         
-                        if(uploadType === 'student') {
-                            checkStatus(currentUploadFolder, currentCardId);
-                        } else {
-                            checkLedgerStatus(); // Refresh stat ledger
-                        }
-                    } else {
-                        throw new Error(result.message);
-                    }
-                } catch (err) {
-                    Swal.fire('Gagal Upload', err.message, 'error');
-                }
+                        // Reload data untuk update statistik global
+                        loadData(); 
+                    } else throw new Error(result.message);
+                } catch (err) { Swal.fire('Gagal', err.message, 'error'); }
             };
             reader.readAsDataURL(file);
             this.value = '';
         });
 
-        // --- TAMBAH & HAPUS SISWA ---
+        // --- TAMBAH & HAPUS ---
         async function addStudent() {
             const nama = document.getElementById('newNama').value;
             const nis = document.getElementById('newNis').value;
-            if(!nama || !nis) return Swal.fire("Data tidak lengkap", "", "warning");
-
+            if(!nama) return;
             document.getElementById('modalAdd').classList.add('hidden');
-            Swal.fire({title: 'Menambahkan Siswa...', didOpen: () => Swal.showLoading()});
-
-            try {
-                await fetch(APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'add', nama, nis })
-                });
-                Swal.fire('Sukses', 'Data siswa berhasil dibuat.', 'success').then(() => loadData());
-                document.getElementById('newNama').value = '';
-                document.getElementById('newNis').value = '';
-            } catch (e) { Swal.fire('Error', e.message, 'error'); }
+            Swal.fire({title: 'Menyimpan...', didOpen: () => Swal.showLoading()});
+            await fetch(APP_URL, {method:'POST', body:JSON.stringify({action:'add', nama, nis})});
+            Swal.fire('Sukses', '', 'success').then(() => loadData());
         }
 
         async function deleteStudent(row) {
-            const result = await Swal.fire({
-                title: 'Hapus Data?',
-                text: "Baris data di spreadsheet akan dihapus.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                confirmButtonText: 'Hapus Permanen'
-            });
-
-            if (result.isConfirmed) {
+            const res = await Swal.fire({title:'Hapus?', icon:'warning', showCancelButton:true, confirmButtonColor:'#d33'});
+            if(res.isConfirmed) {
                 Swal.fire({title: 'Menghapus...', didOpen: () => Swal.showLoading()});
-                await fetch(APP_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'delete', row })
-                });
+                await fetch(APP_URL, {method:'POST', body:JSON.stringify({action:'delete', row})});
                 document.getElementById(`card-${row}`).remove();
-                
-                // Update counter total
-                let currentTotal = parseInt(document.getElementById('statTotal').innerText);
-                document.getElementById('statTotal').innerText = Math.max(0, currentTotal - 1);
-                
                 Swal.close();
             }
         }
 
         function filterStudents() {
             const term = document.getElementById('search').value.toLowerCase();
-            document.querySelectorAll('#grid > div').forEach(card => {
-                card.style.display = card.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
-            });
+            document.querySelectorAll('#grid > div').forEach(c => c.style.display = c.innerText.toLowerCase().includes(term) ? 'flex' : 'none');
         }
     </script>
 </body>

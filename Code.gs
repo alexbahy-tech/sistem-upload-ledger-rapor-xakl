@@ -1,89 +1,38 @@
 // =======================================================
-// 1. KONFIGURASI SISTEM (JANGAN UBAH ID DI SINI)
+// 1. KONFIGURASI SISTEM
 // =======================================================
 const CONFIG = {
-  // ID Spreadsheet Database Siswa
   SHEET_ID: "1vnBRC-DQ05mix6ryjMdg8hmVKpZk2GqJXTuB0oiPFik", 
-  
-  // Nama Sheet/Tab di Spreadsheet
   SHEET_NAME: "Sheet1",
-  
-  // Folder Induk (Tempat folder siswa dibuat otomatis)
   PARENT_FOLDER_ID: "1Og56eOesHTBCJhwTKhAGMYwAJpyAvFHA",
-  
-  // Folder Khusus Ledger (Pusat Data)
   LEDGER_FOLDER_ID: "11rV1PEUjZT4VqIU-UMcEJPAzTDNyJ42_"
 };
 
 // =======================================================
-// 2. API GATEWAY (Penghubung GitHub & Google Script)
+// 2. API GATEWAY
 // =======================================================
 
-/**
- * Handle Request GET (Biasanya untuk mengambil data / cek status)
- */
-function doGet(e) {
-  return handleRequest(e, true);
-}
+function doGet(e) { return handleRequest(e, true); }
+function doPost(e) { return handleRequest(e, false); }
 
-/**
- * Handle Request POST (Biasanya untuk Upload / Simpan Data)
- */
-function doPost(e) {
-  return handleRequest(e, false);
-}
-
-/**
- * Fungsi Utama Pengelola Request
- */
 function handleRequest(e, isGet) {
   const lock = LockService.getScriptLock();
-  // Kunci script 30 detik agar tidak bentrok saat banyak user akses
   lock.tryLock(30000); 
 
   try {
-    let action = "";
-    let data = {};
-
-    // 1. Parsing Data Masuk
-    if (isGet) {
-      // Data dari URL Parameter
-      action = e.parameter.action;
-      data = e.parameter; 
-    } else if (e.postData && e.postData.contents) {
-      // Data dari Body JSON (Fetch)
-      const body = JSON.parse(e.postData.contents);
-      action = body.action;
-      data = body;
-    }
-
+    let action = isGet ? e.parameter.action : JSON.parse(e.postData.contents).action;
+    let data = isGet ? e.parameter : JSON.parse(e.postData.contents);
     let result;
 
-    // 2. Arahkan ke Fungsi yang Sesuai
     switch (action) {
-      case "read":
-        result = getAllStudents();
-        break;
-      case "checkStatus":
-        // Cek folder siswa atau folder ledger
-        result = checkFolderStatus(data.folderId);
-        break;
-      case "add":
-        result = addStudent(data);
-        break;
-      case "delete":
-        result = deleteStudent(data.row);
-        break;
-      case "upload":
-        result = uploadFileToDrive(data);
-        break;
-      default:
-        result = { status: "error", message: "Action tidak dikenal: " + action };
+      case "read": result = getAllStudents(); break;
+      case "checkStatus": result = checkFolderStatus(data.folderId, data.row); break;
+      case "add": result = addStudent(data); break;
+      case "delete": result = deleteStudent(data.row); break;
+      case "upload": result = uploadFileToDrive(data); break;
+      default: result = { status: "error", message: "Action Unknown" };
     }
-
-    // 3. Kembalikan Hasil JSON
     return responseJSON(result);
-
   } catch (err) {
     return responseJSON({ status: "error", message: err.toString() });
   } finally {
@@ -92,166 +41,134 @@ function handleRequest(e, isGet) {
 }
 
 // =======================================================
-// 3. LOGIKA BISNIS (CORE FUNCTIONS)
+// 3. LOGIKA BISNIS
 // =======================================================
 
-/**
- * Helper: Format output jadi JSON
- */
 function responseJSON(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
 }
 
-/**
- * 1. Ambil Semua Data Siswa dari Spreadsheet
- */
 function getAllStudents() {
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
   const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
   const lastRow = sheet.getLastRow();
   
-  if (lastRow < 2) return []; // Belum ada data
+  if (lastRow < 2) return [];
   
-  // Ambil data baris 2 s.d. terakhir, kolom 1 s.d. 5
-  // Format Kolom: [No, NIS, Nama, Kelas, FolderID]
-  const values = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+  // Ambil data sampai Kolom G (7 Kolom)
+  // 1:No | 2:NIS | 3:Nama | 4:Kelas | 5:FolderID | 6:StsIdentitas | 7:StsRapor
+  const values = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
   
-  // Ubah Array Excel jadi Object JSON yang rapi
   return values.map((row, i) => ({
-    row: i + 2,         // Disimpan untuk referensi saat menghapus
+    row: i + 2,
     no: row[0],
     nis: row[1],
     nama: row[2],
     kelas: row[3],
-    folderId: row[4]    // ID Folder Drive Siswa
+    folderId: row[4],
+    hasIdentitas: row[5] === "ADA", // Membaca status dari sheet
+    hasRapor: row[6] === "ADA"      // Membaca status dari sheet
   }));
 }
 
-/**
- * 2. Cek Isi Folder (Bisa Folder Siswa atau Folder Ledger)
- */
-function checkFolderStatus(folderId) {
-  if (!folderId) return { status: "error", message: "Folder ID Kosong" };
+function checkFolderStatus(folderId, row) {
+  if (!folderId) return { status: "error" };
 
-  // LOGIKA KHUSUS: Jika Frontend kirim "LEDGER", ganti ke ID Ledger Asli
-  const targetId = (folderId === "LEDGER") ? CONFIG.LEDGER_FOLDER_ID : folderId;
+  // Cek Ledger
+  if (folderId === "LEDGER") {
+    return checkLedgerFiles();
+  }
   
+  // Cek Siswa & Update Sheet
   try {
-    const folder = DriveApp.getFolderById(targetId);
+    const folder = DriveApp.getFolderById(folderId);
     const files = folder.getFiles();
-    
     let fileList = [];
     let hasRapor = false;
     let hasIdentitas = false;
 
     while (files.hasNext()) {
       let f = files.next();
-      let name = f.getName();
-      let lowerName = name.toLowerCase();
-
-      // OTOMATIS: Set file jadi Public (Anyone with link view)
+      let name = f.getName().toLowerCase();
       f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      
+      if (name.includes("rapor")) hasRapor = true;
+      if (name.includes("identitas")) hasIdentitas = true;
 
-      // Deteksi Kata Kunci
-      if (lowerName.includes("rapor")) hasRapor = true;
-      if (lowerName.includes("identitas")) hasIdentitas = true;
-
-      fileList.push({ 
-        name: name, 
-        url: f.getUrl(),
-        id: f.getId()
-      });
+      fileList.push({ name: f.getName(), url: f.getUrl() });
     }
 
-    return { 
-      status: "success", 
-      hasRapor: hasRapor, 
-      hasIdentitas: hasIdentitas, 
-      files: fileList,
-      totalFiles: fileList.length // Untuk statistik dashboard
-    };
+    // UPDATE SPREADSHEET STATUS
+    if (row) {
+      const sheet = SpreadsheetApp.openById(CONFIG.SHEET_ID).getSheetByName(CONFIG.SHEET_NAME);
+      // Kolom 6 (F) untuk Identitas, 7 (G) untuk Rapor
+      sheet.getRange(row, 6).setValue(hasIdentitas ? "ADA" : "");
+      sheet.getRange(row, 7).setValue(hasRapor ? "ADA" : "");
+    }
+
+    return { status: "success", hasRapor, hasIdentitas, files: fileList };
   } catch (e) {
-    return { status: "error", message: "Gagal cek folder: " + e.message };
+    return { status: "error", message: e.message };
   }
 }
 
-/**
- * 3. Tambah Siswa Baru & Buat Folder
- */
+function checkLedgerFiles() {
+  const folder = DriveApp.getFolderById(CONFIG.LEDGER_FOLDER_ID);
+  const files = folder.getFiles();
+  let fileList = [];
+  while (files.hasNext()) {
+    let f = files.next();
+    f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    fileList.push({ name: f.getName(), url: f.getUrl(), date: f.getLastUpdated() });
+  }
+  return { status: "success", files: fileList, totalFiles: fileList.length };
+}
+
 function addStudent(data) {
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
   const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
   const parentFolder = DriveApp.getFolderById(CONFIG.PARENT_FOLDER_ID);
   
-  // Buat Folder di Google Drive
   const folderName = `${data.nama} - ${data.nis}`;
   const newFolder = parentFolder.createFolder(folderName);
   newFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
-  // Tambah baris baru di Spreadsheet
-  const lastRow = sheet.getLastRow();
-  const newNo = lastRow < 2 ? 1 : lastRow; // Nomor urut sederhana
-  
-  sheet.appendRow([newNo, data.nis, data.nama, "X AKL", newFolder.getId()]);
-  
-  // Auto Sort berdasarkan Nama (Opsional)
-  if (sheet.getLastRow() >= 2) {
-    sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).sort({column: 3, ascending: true});
-  }
+  const newNo = Math.max(1, sheet.getLastRow());
+  sheet.appendRow([newNo, data.nis, data.nama, "X AKL", newFolder.getId(), "", ""]); // +2 kolom kosong
   
   return { status: "success" };
 }
 
-/**
- * 4. Hapus Siswa (Hapus baris Excel)
- */
 function deleteStudent(row) {
-  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-  const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
-  
-  // Hapus baris (Note: Folder di Drive tidak dihapus demi keamanan data)
+  const sheet = SpreadsheetApp.openById(CONFIG.SHEET_ID).getSheetByName(CONFIG.SHEET_NAME);
   sheet.deleteRow(parseInt(row));
   return { status: "success" };
 }
 
-/**
- * 5. Upload File (Support Siswa & Ledger)
- */
 function uploadFileToDrive(data) {
   try {
-    let targetId;
-
-    // PILIH FOLDER TUJUAN
-    if (data.folderId === "LEDGER") {
-      targetId = CONFIG.LEDGER_FOLDER_ID; // Masuk folder Ledger
-    } else {
-      targetId = data.folderId; // Masuk folder Siswa
-    }
-
+    const targetId = (data.folderId === "LEDGER") ? CONFIG.LEDGER_FOLDER_ID : data.folderId;
     const folder = DriveApp.getFolderById(targetId);
     
-    // CEK DUPLIKAT: Hapus file lama dengan nama sama agar tidak menumpuk
+    // Hapus file lama (Duplikat)
     const existing = folder.getFilesByName(data.fileName);
-    while (existing.hasNext()) {
-      existing.next().setTrashed(true);
-    }
+    while (existing.hasNext()) existing.next().setTrashed(true);
 
-    // PROSES UPLOAD BASE64
     const decoded = Utilities.base64Decode(data.fileData);
     const blob = Utilities.newBlob(decoded, data.mimeType, data.fileName);
     const file = folder.createFile(blob);
-    
-    // Set Permission
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
-    return { 
-      status: "success", 
-      url: file.getUrl(),
-      name: file.getName()
-    };
+    // AUTO UPDATE SHEET STATUS (Jika Upload Siswa)
+    if (data.folderId !== "LEDGER" && data.row) {
+      const sheet = SpreadsheetApp.openById(CONFIG.SHEET_ID).getSheetByName(CONFIG.SHEET_NAME);
+      const lowerName = data.fileName.toLowerCase();
+      if(lowerName.includes("identitas")) sheet.getRange(data.row, 6).setValue("ADA");
+      if(lowerName.includes("rapor")) sheet.getRange(data.row, 7).setValue("ADA");
+    }
 
+    return { status: "success", url: file.getUrl() };
   } catch (e) {
-    return { status: "error", message: "Gagal Upload: " + e.message };
+    return { status: "error", message: e.message };
   }
 }
