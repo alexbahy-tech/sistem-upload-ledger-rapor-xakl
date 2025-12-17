@@ -1,305 +1,257 @@
 // =======================================================
-// 1. KONFIGURASI (WAJIB DIISI ULANG!)
+// 1. KONFIGURASI SISTEM (JANGAN UBAH ID DI SINI)
 // =======================================================
-const SHEET_ID = "1vnBRC-DQ05mix6ryjMdg8hmVKpZk2GqJXTuB0oiPFik";
-const SHEET_NAME = "Sheet1";
-const PARENT_FOLDER_ID = "1Og56eOesHTBCJhwTKhAGMYwAJpyAvFHA";
-const LEDGER_FOLDER_ID = "11rV1PEUjZT4VqIU-UMcEJPAzTDNyJ42_";
+const CONFIG = {
+  // ID Spreadsheet Database Siswa
+  SHEET_ID: "1vnBRC-DQ05mix6ryjMdg8hmVKpZk2GqJXTuB0oiPFik", 
+  
+  // Nama Sheet/Tab di Spreadsheet
+  SHEET_NAME: "Sheet1",
+  
+  // Folder Induk (Tempat folder siswa dibuat otomatis)
+  PARENT_FOLDER_ID: "1Og56eOesHTBCJhwTKhAGMYwAJpyAvFHA",
+  
+  // Folder Khusus Ledger (Pusat Data)
+  LEDGER_FOLDER_ID: "11rV1PEUjZT4VqIU-UMcEJPAzTDNyJ42_"
+};
 
 // =======================================================
-// 2. SYSTEM CODE (JANGAN DIUBAH)
+// 2. API GATEWAY (Penghubung GitHub & Google Script)
 // =======================================================
 
+/**
+ * Handle Request GET (Biasanya untuk mengambil data / cek status)
+ */
 function doGet(e) {
-  try {
-    return HtmlService.createHtmlOutputFromFile('index')
-        .setTitle('Sistem Rapor X AKL')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-  } catch(err) {
-    Logger.log("doGet Error: " + err.toString());
-    return HtmlService.createHtmlOutput("Error: " + err.toString());
-  }
+  return handleRequest(e, true);
 }
 
+/**
+ * Handle Request POST (Biasanya untuk Upload / Simpan Data)
+ */
 function doPost(e) {
+  return handleRequest(e, false);
+}
+
+/**
+ * Fungsi Utama Pengelola Request
+ */
+function handleRequest(e, isGet) {
   const lock = LockService.getScriptLock();
-  
-  try {
-    lock.tryLock(10000);
-  } catch(lockErr) {
-    return responseJSON({ status: "error", message: "Could not acquire lock: " + lockErr.toString() });
-  }
+  // Kunci script 30 detik agar tidak bentrok saat banyak user akses
+  lock.tryLock(30000); 
 
   try {
-    // Parse parameter action
-    var action = null;
-    if (e && e.parameter && e.parameter.action) {
+    let action = "";
+    let data = {};
+
+    // 1. Parsing Data Masuk
+    if (isGet) {
+      // Data dari URL Parameter
       action = e.parameter.action;
-    }
-    
-    Logger.log("Action received: " + action);
-    
-    const ss = SpreadsheetApp.openById(SHEET_ID);
-    const sheet = ss.getSheetByName(SHEET_NAME);
-
-    // --- A. BACA DATA ---
-    if (!action || action === "read") {
-      const lastRow = sheet.getLastRow();
-      if (lastRow < 2) {
-        return responseJSON({ status: "success", data: [] });
-      }
-      
-      const data = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
-      const result = data.map(function(row, index) {
-        return {
-          row: index + 2,
-          no: row[0],
-          nis: row[1],
-          nama: row[2],
-          kelas: row[3],
-          folder_id: row[4]
-        };
-      });
-      
-      return responseJSON({ status: "success", data: result });
+      data = e.parameter; 
+    } else if (e.postData && e.postData.contents) {
+      // Data dari Body JSON (Fetch)
+      const body = JSON.parse(e.postData.contents);
+      action = body.action;
+      data = body;
     }
 
-    // --- B. CEK STATUS FILE ---
-    if (action === "check_status") {
-      var folderId = e.parameter.folderId;
-      
-      if (!folderId) {
-        return responseJSON({ 
-          status: "error", 
-          message: "No folder ID provided",
-          hasRapor: false,
-          hasIdentitas: false
-        });
-      }
-      
-      try {
-        const folder = DriveApp.getFolderById(folderId);
-        const files = folder.getFiles();
-        var hasRapor = false;
-        var hasIdentitas = false;
-        var fileList = [];
-        
-        while (files.hasNext()) {
-          var file = files.next();
-          var fileName = file.getName();
-          var fileNameLower = fileName.toLowerCase();
-          
-          fileList.push(fileName);
-          
-          // Cek kata kunci
-          if (fileNameLower.indexOf("rapor") > -1) {
-            hasRapor = true;
-            Logger.log("Found Rapor file: " + fileName);
-          }
-          
-          if (fileNameLower.indexOf("identitas") > -1) {
-            hasIdentitas = true;
-            Logger.log("Found Identitas file: " + fileName);
-          }
-        }
-        
-        Logger.log("Folder: " + folderId + " | Files: " + fileList.length + " | Rapor: " + hasRapor + " | Identitas: " + hasIdentitas);
-        
-        return responseJSON({ 
-          status: "success", 
-          hasRapor: hasRapor, 
-          hasIdentitas: hasIdentitas,
-          fileCount: fileList.length,
-          files: fileList
-        });
-        
-      } catch (err) {
-        Logger.log("Error in check_status: " + err.toString());
-        return responseJSON({ 
-          status: "error", 
-          message: err.toString(),
-          hasRapor: false,
-          hasIdentitas: false
-        });
-      }
+    let result;
+
+    // 2. Arahkan ke Fungsi yang Sesuai
+    switch (action) {
+      case "read":
+        result = getAllStudents();
+        break;
+      case "checkStatus":
+        // Cek folder siswa atau folder ledger
+        result = checkFolderStatus(data.folderId);
+        break;
+      case "add":
+        result = addStudent(data);
+        break;
+      case "delete":
+        result = deleteStudent(data.row);
+        break;
+      case "upload":
+        result = uploadFileToDrive(data);
+        break;
+      default:
+        result = { status: "error", message: "Action tidak dikenal: " + action };
     }
 
-    // --- C. CEK LEDGER ---
-    if (action === "check_ledger") {
-      try {
-        const folder = DriveApp.getFolderById(LEDGER_FOLDER_ID);
-        const files = folder.getFiles();
-        var hasFile = false;
-        var fileUrl = "";
-        var fileName = "";
-        
-        if (files.hasNext()) {
-          var file = files.next();
-          hasFile = true;
-          fileUrl = file.getUrl();
-          fileName = file.getName();
-        }
-        
-        return responseJSON({ 
-          status: "success", 
-          hasFile: hasFile, 
-          fileUrl: fileUrl, 
-          fileName: fileName 
-        });
-        
-      } catch(err) {
-        Logger.log("Error in check_ledger: " + err.toString());
-        return responseJSON({ 
-          status: "error", 
-          message: err.toString(),
-          hasFile: false
-        });
-      }
-    }
-
-    // --- D. UPLOAD FILE ---
-    if (action === "upload") {
-      try {
-        if (!e.postData || !e.postData.contents) {
-          return responseJSON({ status: "error", message: "No post data" });
-        }
-        
-        var d = JSON.parse(e.postData.contents);
-        
-        if (!d.folderId || !d.fileName || !d.fileData) {
-          return responseJSON({ status: "error", message: "Missing required fields" });
-        }
-        
-        var targetId = (d.folderId === "LEDGER") ? LEDGER_FOLDER_ID : d.folderId;
-        const folder = DriveApp.getFolderById(targetId);
-        
-        // Hapus file lama dengan nama yang sama
-        var existingFiles = folder.getFilesByName(d.fileName);
-        while (existingFiles.hasNext()) {
-          var oldFile = existingFiles.next();
-          oldFile.setTrashed(true);
-          Logger.log("Deleted old file: " + d.fileName);
-        }
-        
-        // Upload file baru
-        var mimeType = d.mimeType || "application/pdf";
-        var decodedData = Utilities.base64Decode(d.fileData);
-        var blob = Utilities.newBlob(decodedData, mimeType, d.fileName);
-        var newFile = folder.createFile(blob);
-        
-        // Set sharing
-        newFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        
-        Logger.log("Uploaded file: " + d.fileName + " to folder: " + targetId);
-        
-        return responseJSON({ 
-          status: "success", 
-          url: newFile.getUrl(),
-          fileName: newFile.getName(),
-          fileId: newFile.getId()
-        });
-        
-      } catch (err) {
-        Logger.log("Error in upload: " + err.toString());
-        return responseJSON({ 
-          status: "error", 
-          message: err.toString() 
-        });
-      }
-    }
-
-    // --- E. TAMBAH SISWA ---
-    if (action === "add") {
-      try {
-        if (!e.postData || !e.postData.contents) {
-          return responseJSON({ status: "error", message: "No post data" });
-        }
-        
-        var p = JSON.parse(e.postData.contents);
-        
-        if (!p.nama) {
-          return responseJSON({ status: "error", message: "Nama is required" });
-        }
-        
-        const parentFolder = DriveApp.getFolderById(PARENT_FOLDER_ID);
-        var folderName = p.nama + " - " + (p.nis || "");
-        const newFolder = parentFolder.createFolder(folderName);
-        newFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        
-        var lastRow = sheet.getLastRow();
-        var newNo = lastRow > 1 ? lastRow : 1;
-        
-        sheet.appendRow([newNo, p.nis || "", p.nama, "X AKL", newFolder.getId()]);
-        
-        // Auto Sort A-Z
-        var dataRange = sheet.getLastRow();
-        if (dataRange >= 2) {
-          sheet.getRange(2, 1, dataRange - 1, 5).sort({column: 3, ascending: true});
-        }
-        
-        Logger.log("Added student: " + p.nama);
-        
-        return responseJSON({ status: "success" });
-        
-      } catch(err) {
-        Logger.log("Error in add: " + err.toString());
-        return responseJSON({ 
-          status: "error", 
-          message: err.toString() 
-        });
-      }
-    }
-
-    // --- F. HAPUS SISWA ---
-    if (action === "delete") {
-      try {
-        if (!e.postData || !e.postData.contents) {
-          return responseJSON({ status: "error", message: "No post data" });
-        }
-        
-        var p = JSON.parse(e.postData.contents);
-        
-        if (!p.row) {
-          return responseJSON({ status: "error", message: "Row number is required" });
-        }
-        
-        var rowNum = parseInt(p.row);
-        sheet.deleteRow(rowNum);
-        
-        Logger.log("Deleted row: " + rowNum);
-        
-        return responseJSON({ status: "success" });
-        
-      } catch(err) {
-        Logger.log("Error in delete: " + err.toString());
-        return responseJSON({ 
-          status: "error", 
-          message: err.toString() 
-        });
-      }
-    }
-
-    // Action tidak dikenali
-    return responseJSON({ 
-      status: "error", 
-      message: "Unknown action: " + action 
-    });
+    // 3. Kembalikan Hasil JSON
+    return responseJSON(result);
 
   } catch (err) {
-    Logger.log("doPost Error: " + err.toString());
-    return responseJSON({ 
-      status: "error", 
-      message: err.toString() 
-    });
+    return responseJSON({ status: "error", message: err.toString() });
   } finally {
-    if (lock) {
-      lock.releaseLock();
-    }
+    lock.releaseLock();
   }
 }
 
-function responseJSON(obj) {
-  var json = JSON.stringify(obj);
-  return ContentService.createTextOutput(json)
-      .setMimeType(ContentService.MimeType.JSON);
+// =======================================================
+// 3. LOGIKA BISNIS (CORE FUNCTIONS)
+// =======================================================
+
+/**
+ * Helper: Format output jadi JSON
+ */
+function responseJSON(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * 1. Ambil Semua Data Siswa dari Spreadsheet
+ */
+function getAllStudents() {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  const lastRow = sheet.getLastRow();
+  
+  if (lastRow < 2) return []; // Belum ada data
+  
+  // Ambil data baris 2 s.d. terakhir, kolom 1 s.d. 5
+  // Format Kolom: [No, NIS, Nama, Kelas, FolderID]
+  const values = sheet.getRange(2, 1, lastRow - 1, 5).getValues();
+  
+  // Ubah Array Excel jadi Object JSON yang rapi
+  return values.map((row, i) => ({
+    row: i + 2,         // Disimpan untuk referensi saat menghapus
+    no: row[0],
+    nis: row[1],
+    nama: row[2],
+    kelas: row[3],
+    folderId: row[4]    // ID Folder Drive Siswa
+  }));
+}
+
+/**
+ * 2. Cek Isi Folder (Bisa Folder Siswa atau Folder Ledger)
+ */
+function checkFolderStatus(folderId) {
+  if (!folderId) return { status: "error", message: "Folder ID Kosong" };
+
+  // LOGIKA KHUSUS: Jika Frontend kirim "LEDGER", ganti ke ID Ledger Asli
+  const targetId = (folderId === "LEDGER") ? CONFIG.LEDGER_FOLDER_ID : folderId;
+  
+  try {
+    const folder = DriveApp.getFolderById(targetId);
+    const files = folder.getFiles();
+    
+    let fileList = [];
+    let hasRapor = false;
+    let hasIdentitas = false;
+
+    while (files.hasNext()) {
+      let f = files.next();
+      let name = f.getName();
+      let lowerName = name.toLowerCase();
+
+      // OTOMATIS: Set file jadi Public (Anyone with link view)
+      f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+      // Deteksi Kata Kunci
+      if (lowerName.includes("rapor")) hasRapor = true;
+      if (lowerName.includes("identitas")) hasIdentitas = true;
+
+      fileList.push({ 
+        name: name, 
+        url: f.getUrl(),
+        id: f.getId()
+      });
+    }
+
+    return { 
+      status: "success", 
+      hasRapor: hasRapor, 
+      hasIdentitas: hasIdentitas, 
+      files: fileList,
+      totalFiles: fileList.length // Untuk statistik dashboard
+    };
+  } catch (e) {
+    return { status: "error", message: "Gagal cek folder: " + e.message };
+  }
+}
+
+/**
+ * 3. Tambah Siswa Baru & Buat Folder
+ */
+function addStudent(data) {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  const parentFolder = DriveApp.getFolderById(CONFIG.PARENT_FOLDER_ID);
+  
+  // Buat Folder di Google Drive
+  const folderName = `${data.nama} - ${data.nis}`;
+  const newFolder = parentFolder.createFolder(folderName);
+  newFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  // Tambah baris baru di Spreadsheet
+  const lastRow = sheet.getLastRow();
+  const newNo = lastRow < 2 ? 1 : lastRow; // Nomor urut sederhana
+  
+  sheet.appendRow([newNo, data.nis, data.nama, "X AKL", newFolder.getId()]);
+  
+  // Auto Sort berdasarkan Nama (Opsional)
+  if (sheet.getLastRow() >= 2) {
+    sheet.getRange(2, 1, sheet.getLastRow() - 1, 5).sort({column: 3, ascending: true});
+  }
+  
+  return { status: "success" };
+}
+
+/**
+ * 4. Hapus Siswa (Hapus baris Excel)
+ */
+function deleteStudent(row) {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  
+  // Hapus baris (Note: Folder di Drive tidak dihapus demi keamanan data)
+  sheet.deleteRow(parseInt(row));
+  return { status: "success" };
+}
+
+/**
+ * 5. Upload File (Support Siswa & Ledger)
+ */
+function uploadFileToDrive(data) {
+  try {
+    let targetId;
+
+    // PILIH FOLDER TUJUAN
+    if (data.folderId === "LEDGER") {
+      targetId = CONFIG.LEDGER_FOLDER_ID; // Masuk folder Ledger
+    } else {
+      targetId = data.folderId; // Masuk folder Siswa
+    }
+
+    const folder = DriveApp.getFolderById(targetId);
+    
+    // CEK DUPLIKAT: Hapus file lama dengan nama sama agar tidak menumpuk
+    const existing = folder.getFilesByName(data.fileName);
+    while (existing.hasNext()) {
+      existing.next().setTrashed(true);
+    }
+
+    // PROSES UPLOAD BASE64
+    const decoded = Utilities.base64Decode(data.fileData);
+    const blob = Utilities.newBlob(decoded, data.mimeType, data.fileName);
+    const file = folder.createFile(blob);
+    
+    // Set Permission
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    return { 
+      status: "success", 
+      url: file.getUrl(),
+      name: file.getName()
+    };
+
+  } catch (e) {
+    return { status: "error", message: "Gagal Upload: " + e.message };
+  }
 }
