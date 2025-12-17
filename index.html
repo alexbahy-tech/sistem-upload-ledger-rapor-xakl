@@ -389,6 +389,14 @@
         </div>
 
         <!-- Action Buttons -->
+        <button 
+          onclick="refreshPreview()" 
+          class="flex items-center justify-center py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold mb-3 transition shadow-lg"
+        >
+          <i class="fa-solid fa-sync mr-2"></i> 
+          Refresh Preview
+        </button>
+        
         <a 
           id="btnDrive" 
           href="#" 
@@ -425,17 +433,22 @@
   <div id="toast" class="fixed bottom-6 right-6 hidden px-6 py-4 rounded-xl shadow-2xl text-white z-[70] flex items-center gap-3 transition-all animate-scale"></div>
 
   <script>
-    const APP_URL = "https://script.google.com/macros/s/AKfycbzksZa0wzjtKi_O4qxkQIAN-jkNsliZ5UKIp1QTFndWdQARZMyVrrrZbjcNIjqao9y_/exec";
+    // GANTI URL INI DENGAN URL WEB APP ANDA!
+    const APP_URL = "https://script.google.com/macros/s/AKfycby56qMXdR_sFMyPumX41JAwEK9zjiLz0kV7_A6Q8AXk-Jk3SOOyT1xV-P7TiRlcTpbytw/exec";
 
     let students = [];
     let currentStudent = null;
 
+    // ========================================
+    // INITIALIZATION
+    // ========================================
     document.addEventListener("DOMContentLoaded", () => {
-        if(APP_URL.includes("MASUKKAN_URL")) { 
-            alert("PERINGATAN: URL Web App belum diisi di index.html!"); 
+        if(APP_URL.includes("MASUKKAN_URL") || APP_URL.includes("AKfycbzksZa0wzjtKi_O4qxkQIAN")) { 
+            alert("⚠️ PERINGATAN: URL Web App belum diisi di index.html!\n\nSilakan ganti APP_URL dengan URL deployment Anda."); 
         }
         loadData();
         checkLedger();
+        
         document.getElementById("searchInput").addEventListener("input", handleSearch);
         document.getElementById("fileInput").addEventListener("change", (e) => {
             if(e.target.files[0]) {
@@ -444,6 +457,9 @@
         });
     });
 
+    // ========================================
+    // DATA LOADING
+    // ========================================
     async function loadData() {
         toggleLoading(true);
         try {
@@ -456,6 +472,7 @@
                 checkFileStatusLazy(students);
             }
         } catch(e) { 
+            console.error("Error loading data:", e);
             showToast("Gagal memuat data", true); 
         } finally { 
             toggleLoading(false); 
@@ -464,15 +481,15 @@
 
     async function checkFileStatusLazy(data) {
         let countRapor = 0, countIdentitas = 0;
+        
         for(const s of data) {
             try {
                 const res = await fetchCall("check_status", { folderId: s.folder_id }, true);
+                
                 if(res.hasRapor) countRapor++;
                 if(res.hasIdentitas) countIdentitas++;
                 
-                document.getElementById("statRapor").innerText = countRapor;
-                document.getElementById("statIdentitas").innerText = countIdentitas;
-                
+                // Update badge untuk siswa ini
                 const badgeEl = document.getElementById(`badge-${s.row}`);
                 if(badgeEl) {
                     badgeEl.innerHTML = `
@@ -484,17 +501,61 @@
                         </span>
                     `;
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error("Error checking status for", s.nama, e);
+                const badgeEl = document.getElementById(`badge-${s.row}`);
+                if(badgeEl) {
+                    badgeEl.innerHTML = `
+                        <span class="text-xs bg-red-50 text-red-400 px-3 py-1.5 rounded-lg border border-red-200">
+                            <i class="fa-solid fa-exclamation-triangle mr-1"></i> Gagal cek status
+                        </span>
+                    `;
+                }
+            }
+        }
+        
+        // Update statistik
+        document.getElementById("statRapor").innerText = countRapor;
+        document.getElementById("statIdentitas").innerText = countIdentitas;
+    }
+    
+    async function updateStudentBadge(student) {
+        const badgeEl = document.getElementById(`badge-${student.row}`);
+        if(!badgeEl) return;
+        
+        try {
+            const res = await fetchCall("check_status", { folderId: student.folder_id }, true);
+            
+            badgeEl.innerHTML = `
+                <span class="px-3 py-1 rounded-lg text-xs font-bold ${res.hasIdentitas ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' : 'bg-red-50 text-red-400 border border-red-200'}">
+                    <i class="fa-solid fa-id-card mr-1"></i> Identitas
+                </span>
+                <span class="px-3 py-1 rounded-lg text-xs font-bold ${res.hasRapor ? 'bg-purple-100 text-purple-700 border border-purple-300' : 'bg-red-50 text-red-400 border border-red-200'}">
+                    <i class="fa-solid fa-file-alt mr-1"></i> Rapor
+                </span>
+            `;
+        } catch(e) {
+            console.error("Error updating badge:", e);
+            badgeEl.innerHTML = `
+                <span class="text-xs bg-red-50 text-red-400 px-3 py-1.5 rounded-lg border border-red-200">
+                    <i class="fa-solid fa-exclamation-triangle mr-1"></i> Gagal cek status
+                </span>
+            `;
         }
     }
 
+    // ========================================
+    // STUDENT MANAGEMENT
+    // ========================================
     async function addStudent() {
-        const nama = document.getElementById("newNama").value;
-        const nis = document.getElementById("newNis").value;
+        const nama = document.getElementById("newNama").value.trim();
+        const nis = document.getElementById("newNis").value.trim();
+        
         if(!nama) return showToast("Nama siswa harus diisi!", true);
         if(!nis) return showToast("NIS harus diisi!", true);
         
         const btn = document.getElementById("btnAddSave");
+        const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...';
         btn.disabled = true;
 
@@ -506,19 +567,40 @@
             showToast("Siswa berhasil ditambahkan!");
             loadData();
         } catch(e) { 
+            console.error("Error adding student:", e);
             showToast("Gagal menambahkan siswa", true); 
         } finally { 
-            btn.innerHTML = "Simpan Data";
+            btn.innerHTML = originalText;
             btn.disabled = false; 
         }
     }
 
+    async function deleteStudent() {
+        if(!currentStudent) return;
+        if(!confirm(`Apakah Anda yakin ingin menghapus data ${currentStudent.nama}?`)) return;
+        
+        try {
+            await fetchCall("delete", { row: currentStudent.row });
+            closeDetail();
+            showToast("Data siswa berhasil dihapus");
+            loadData();
+        } catch(e) { 
+            console.error("Error deleting student:", e);
+            showToast("Gagal menghapus data", true); 
+        }
+    }
+
+    // ========================================
+    // FILE UPLOAD
+    // ========================================
     async function uploadFile() {
         const file = document.getElementById("fileInput").files[0];
         const type = document.getElementById("uploadType").value;
+        
         if(!file) return showToast("Pilih file PDF terlebih dahulu", true);
 
         const btn = document.getElementById("btnUpload");
+        const originalHTML = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengupload...';
         btn.disabled = true;
 
@@ -532,29 +614,36 @@
                     mimeType: "application/pdf",
                     fileData: reader.result.split(",")[1]
                 });
+                
                 showToast("File berhasil diupload!");
                 document.getElementById("fileInput").value = "";
                 document.getElementById("fileNameDisplay").innerText = "";
-                document.getElementById("previewFrame").src = document.getElementById("previewFrame").src;
+                
+                // Force refresh preview dengan timestamp
+                const previewFrame = document.getElementById("previewFrame");
+                const newSrc = `https://drive.google.com/embeddedfolderview?id=${currentStudent.folder_id}#list&t=${new Date().getTime()}`;
+                previewFrame.src = newSrc;
+                
+                // Update badge status
+                await updateStudentBadge(currentStudent);
+                
+                // Reload statistik
+                await checkFileStatusLazy(students);
+                
             } catch(e) { 
+                console.error("Error uploading file:", e);
                 showToast("Gagal mengupload file", true); 
             } finally { 
-                btn.innerHTML = '<i class="fa-solid fa-upload mr-2"></i> Upload Dokumen';
+                btn.innerHTML = originalHTML;
                 btn.disabled = false; 
             }
         };
-    }
-
-    async function deleteStudent() {
-        if(!confirm(`Apakah Anda yakin ingin menghapus data ${currentStudent.nama}?`)) return;
-        try {
-            await fetchCall("delete", { row: currentStudent.row });
-            closeDetail();
-            showToast("Data siswa berhasil dihapus");
-            loadData();
-        } catch(e) { 
-            showToast("Gagal menghapus data", true); 
-        }
+        
+        reader.onerror = () => {
+            showToast("Gagal membaca file", true);
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
+        };
     }
 
     async function checkLedger() {
@@ -562,6 +651,7 @@
             const res = await fetchCall("check_ledger");
             const el = document.getElementById("ledgerStatus");
             const btn = document.getElementById("btnViewLedger");
+            
             if(res.hasFile) {
                 el.innerText = "📗 " + res.fileName;
                 el.className = "text-sm font-bold text-emerald-600 truncate";
@@ -572,12 +662,15 @@
                 el.className = "text-sm font-bold text-red-500";
                 btn.classList.add("hidden");
             }
-        } catch(e){}
+        } catch(e){
+            console.error("Error checking ledger:", e);
+        }
     }
 
     function uploadLedger(input) {
         const file = input.files[0];
         if(!file) return;
+        
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async () => {
@@ -592,13 +685,18 @@
                 showToast("Ledger berhasil diupload!");
                 checkLedger();
             } catch(e) { 
+                console.error("Error uploading ledger:", e);
                 showToast("Gagal mengupload Ledger", true); 
             }
         };
     }
 
+    // ========================================
+    // UI RENDERING
+    // ========================================
     function renderGrid(data) {
         const grid = document.getElementById("studentGrid");
+        
         if(data.length === 0) {
             grid.innerHTML = `
                 <div class="col-span-full text-center py-16">
@@ -616,7 +714,7 @@
             div.className = "bg-white p-6 rounded-2xl shadow-md hover:shadow-xl cursor-pointer transition-all card-hover group relative overflow-hidden border border-slate-100";
             div.onclick = () => openDetail(s);
             
-            // Gradient accent
+            // Gradient accent colors
             const colors = ['blue', 'purple', 'emerald', 'yellow'];
             const color = colors[index % colors.length];
             
@@ -650,6 +748,9 @@
         });
     }
 
+    // ========================================
+    // MODAL MANAGEMENT
+    // ========================================
     function openDetail(s) {
         currentStudent = s;
         document.getElementById("modalNama").innerText = s.nama;
@@ -657,19 +758,44 @@
         document.getElementById("btnDrive").href = `https://drive.google.com/drive/folders/${s.folder_id}`;
         document.getElementById("previewFrame").src = `https://drive.google.com/embeddedfolderview?id=${s.folder_id}#list`;
         document.getElementById("detailModal").classList.remove("hidden");
+        
+        // Reset file input
+        document.getElementById("fileInput").value = "";
+        document.getElementById("fileNameDisplay").innerText = "";
     }
     
     function closeDetail() { 
         document.getElementById("detailModal").classList.add("hidden"); 
         document.getElementById("previewFrame").src = ""; 
+        currentStudent = null;
+    }
+    
+    function refreshPreview() {
+        if(!currentStudent) return;
+        
+        const previewFrame = document.getElementById("previewFrame");
+        const newSrc = `https://drive.google.com/embeddedfolderview?id=${currentStudent.folder_id}#list&t=${new Date().getTime()}`;
+        previewFrame.src = newSrc;
+        
+        showToast("Preview di-refresh!");
+        
+        // Update badge juga
+        updateStudentBadge(currentStudent);
     }
     
     function openAddModal() { 
-        document.getElementById("addModal").classList.remove("hidden"); 
+        document.getElementById("addModal").classList.remove("hidden");
+        document.getElementById("newNama").value = "";
+        document.getElementById("newNis").value = "";
+        document.getElementById("newNama").focus();
     }
-    
+
+    // ========================================
+    // UTILITY FUNCTIONS
+    // ========================================
     function toggleLoading(show) { 
         document.getElementById("loading").classList.toggle("hidden", !show); 
+        document.getElementById("studentGrid").classList.toggle("hidden", show);
     }
     
     function updateStats(total) { 
@@ -678,11 +804,18 @@
     }
     
     function handleSearch(e) { 
-        const v = e.target.value.toLowerCase(); 
+        const v = e.target.value.toLowerCase().trim();
+        
+        if(v === "") {
+            renderGrid(students);
+            return;
+        }
+        
         const filtered = students.filter(s => 
             s.nama.toLowerCase().includes(v) || 
             s.nis.toString().includes(v)
         );
+        
         renderGrid(filtered);
     }
     
@@ -697,16 +830,24 @@
         `;
         t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl text-white z-[70] flex items-center gap-3 transition-all animate-scale ${err ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-emerald-500 to-emerald-600'}`;
         t.classList.remove("hidden"); 
+        
         setTimeout(() => t.classList.add("hidden"), 3000);
     }
 
+    // ========================================
+    // API CALLS
+    // ========================================
     function fetchCall(action, payload={}, isGet=false) {
         return new Promise((resolve, reject) => {
             const url = APP_URL;
+            
             if(isGet) {
                 const params = new URLSearchParams({action, ...payload}).toString();
                 fetch(url + "?" + params)
-                    .then(r => r.json())
+                    .then(r => {
+                        if(!r.ok) throw new Error(`HTTP ${r.status}`);
+                        return r.json();
+                    })
                     .then(resolve)
                     .catch(reject);
             } else {
@@ -714,7 +855,10 @@
                     method: "POST", 
                     body: JSON.stringify(payload) 
                 })
-                    .then(r => r.json())
+                    .then(r => {
+                        if(!r.ok) throw new Error(`HTTP ${r.status}`);
+                        return r.json();
+                    })
                     .then(resolve)
                     .catch(reject);
             }
