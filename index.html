@@ -238,10 +238,16 @@
         <h2 class="text-2xl font-bold text-white mb-1">Daftar Siswa</h2>
         <div class="h-1 w-20 gradient-card rounded-full"></div>
       </div>
-      <button onclick="openAddModal()" class="btn-primary text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-3 hover:gap-4 transition-all">
-        <i class="fa-solid fa-user-plus"></i> 
-        <span>Tambah Siswa</span>
-      </button>
+      <div class="flex gap-3">
+        <button onclick="refreshAllStatus()" id="btnRefresh" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm border border-white/30">
+          <i class="fa-solid fa-sync-alt"></i> 
+          <span class="hidden md:inline">Refresh Status</span>
+        </button>
+        <button onclick="openAddModal()" class="btn-primary text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-3 hover:gap-4 transition-all">
+          <i class="fa-solid fa-user-plus"></i> 
+          <span>Tambah Siswa</span>
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -429,6 +435,8 @@
     async function updateSingleStudentStatus(student) {
         try {
             const res = await fetchCall("check_status", { folderId: student.folder_id }, true);
+            console.log(`Status check for ${student.nama}:`, res);
+            
             const badgeEl = document.getElementById(`badge-${student.row}`);
             if(badgeEl) {
                 badgeEl.innerHTML = `
@@ -444,6 +452,81 @@
         } catch(e) {
             console.error("Error updating status:", e);
             return { hasRapor: false, hasIdentitas: false };
+        }
+    }
+
+    // Fungsi dengan retry mechanism
+    async function updateSingleStudentStatusWithRetry(student, retries = 3) {
+        for(let i = 0; i < retries; i++) {
+            try {
+                console.log(`Attempt ${i + 1} to check status for ${student.nama}`);
+                const res = await fetchCall("check_status", { folderId: student.folder_id }, true);
+                console.log(`Status check result:`, res);
+                
+                const badgeEl = document.getElementById(`badge-${student.row}`);
+                if(badgeEl) {
+                    badgeEl.innerHTML = `
+                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasIdentitas ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
+                            ${res.hasIdentitas ? '✓' : '✗'} ID
+                        </span>
+                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasRapor ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
+                            ${res.hasRapor ? '✓' : '✗'} Rapor
+                        </span>
+                    `;
+                }
+                
+                // Jika sudah berhasil detect file, break
+                if(res.hasRapor || res.hasIdentitas) {
+                    console.log("File detected successfully!");
+                    return res;
+                }
+                
+                // Jika belum terdetect, tunggu 1 detik sebelum retry
+                if(i < retries - 1) {
+                    console.log("File not detected yet, retrying in 1 second...");
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            } catch(e) {
+                console.error(`Error on attempt ${i + 1}:`, e);
+                if(i === retries - 1) throw e;
+            }
+        }
+        return { hasRapor: false, hasIdentitas: false };
+    }
+
+    // Refresh global stats
+    async function refreshGlobalStats() {
+        let countRapor = 0, countIdentitas = 0;
+        for(const s of students) {
+            try {
+                const res = await fetchCall("check_status", { folderId: s.folder_id }, true);
+                if(res.hasRapor) countRapor++;
+                if(res.hasIdentitas) countIdentitas++;
+            } catch(e) {
+                console.error("Error refreshing stats:", e);
+            }
+        }
+        document.getElementById("statRapor").innerText = countRapor;
+        document.getElementById("statIdentitas").innerText = countIdentitas;
+    }
+
+    // Fungsi refresh manual semua status
+    async function refreshAllStatus() {
+        const btn = document.getElementById("btnRefresh");
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-sync-alt fa-spin"></i> <span class="hidden md:inline">Memuat...</span>';
+        btn.disabled = true;
+        
+        try {
+            showToast("🔄 Memperbarui semua status...");
+            await checkFileStatusLazy(students);
+            showToast("✅ Status berhasil diperbarui!");
+        } catch(e) {
+            showToast("❌ Gagal refresh status", true);
+            console.error("Refresh error:", e);
+        } finally {
+            btn.innerHTML = originalHTML;
+            btn.disabled = false;
         }
     }
 
@@ -484,13 +567,16 @@
         reader.readAsDataURL(file);
         reader.onload = async () => {
             try {
-                await fetchCall("upload", {
+                const uploadResult = await fetchCall("upload", {
                     folderId: currentStudent.folder_id,
                     fileName: `${type}_${currentStudent.nama}.pdf`,
                     mimeType: "application/pdf",
                     fileData: reader.result.split(",")[1]
                 });
+                
+                console.log("Upload result:", uploadResult);
                 showToast("✅ File berhasil diupload!");
+                
                 document.getElementById("fileInput").value = "";
                 document.getElementById("fileNameDisplay").innerText = "";
                 
@@ -499,11 +585,16 @@
                 const currentSrc = previewFrame.src.split('?')[0];
                 previewFrame.src = currentSrc + '?t=' + new Date().getTime();
                 
-                // Update badge status untuk siswa ini
-                await updateSingleStudentStatus(currentStudent);
+                // Tunggu sebentar agar Google Drive sinkron
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                // Refresh full data
-                await loadData();
+                // Update badge status untuk siswa ini dengan retry
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Memperbarui status...';
+                await updateSingleStudentStatusWithRetry(currentStudent);
+                
+                // Refresh statistik global
+                await refreshGlobalStats();
+                
             } catch(e) { 
                 showToast("❌ Gagal upload file", true); 
                 console.error("Upload error:", e);

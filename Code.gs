@@ -51,26 +51,39 @@ function doPost(e) {
         const folder = DriveApp.getFolderById(folderId);
         const files = folder.getFiles();
         let hasRapor = false, hasIdentitas = false;
+        let fileList = [];
         
         while (files.hasNext()) {
           const file = files.next();
-          const name = file.getName().toLowerCase();
+          const name = file.getName();
+          const nameLower = name.toLowerCase();
+          
+          fileList.push(name); // Log semua file
           
           // Cek apakah file mengandung kata "rapor" atau "identitas"
-          if (name.includes("rapor")) {
+          if (nameLower.indexOf("rapor") !== -1) {
             hasRapor = true;
+            Logger.log("Found Rapor: " + name);
           }
-          if (name.includes("identitas")) {
+          if (nameLower.indexOf("identitas") !== -1) {
             hasIdentitas = true;
+            Logger.log("Found Identitas: " + name);
           }
         }
+        
+        Logger.log("Folder ID: " + folderId);
+        Logger.log("Files found: " + fileList.join(", "));
+        Logger.log("Has Rapor: " + hasRapor + ", Has Identitas: " + hasIdentitas);
         
         return responseJSON({ 
           status: "success", 
           hasRapor: hasRapor, 
-          hasIdentitas: hasIdentitas 
+          hasIdentitas: hasIdentitas,
+          fileCount: fileList.length,
+          files: fileList
         });
       } catch (err) {
+        Logger.log("Error checking status: " + err.toString());
         return responseJSON({ 
           status: "error", 
           message: err.toString(),
