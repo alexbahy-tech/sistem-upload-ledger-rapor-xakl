@@ -7,42 +7,33 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     body { 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
     }
     
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+    .bg-pattern {
+      background-color: #f8fafc;
+      background-image: 
+        radial-gradient(circle at 25px 25px, rgba(102, 126, 234, 0.03) 2%, transparent 0%),
+        radial-gradient(circle at 75px 75px, rgba(253, 224, 71, 0.03) 2%, transparent 0%);
+      background-size: 100px 100px;
+    }
+    
+    .gradient-blue-yellow {
+      background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #fde047 100%);
     }
     
     .gradient-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .gradient-purple {
-      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-    }
-    
-    .gradient-blue {
-      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
-    }
-    
-    .gradient-green {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    }
-    
-    .gradient-orange {
-      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(253, 224, 71, 0.1) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
     }
     
     .animate-in { 
-      animation: fadeInUp 0.5s ease-out;
+      animation: fadeInUp 0.5s ease-out; 
     }
     
     @keyframes fadeInUp { 
@@ -56,26 +47,47 @@
       } 
     }
     
+    .animate-scale {
+      animation: scaleIn 0.3s ease-out;
+    }
+    
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
+    ::-webkit-scrollbar { 
+      width: 8px; 
+      height: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(135deg, #3b82f6 0%, #fde047 100%);
+      border-radius: 10px; 
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #facc15 100%);
+    }
+    
     .card-hover {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .card-hover:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    }
-    
-    ::-webkit-scrollbar { 
-      width: 8px; 
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    
-    ::-webkit-scrollbar-thumb { 
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 4px; 
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
     }
     
     .stat-card {
@@ -91,65 +103,71 @@
       width: 200%;
       height: 200%;
       background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: pulse 3s ease-in-out infinite;
+      animation: rotate 20s linear infinite;
     }
     
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 0.8; }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     
-    .badge-glow {
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
-    input:focus, select:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-    }
-    
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .btn-gradient {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       transition: all 0.3s ease;
     }
     
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    .btn-gradient:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
     }
     
-    .floating {
-      animation: floating 3s ease-in-out infinite;
+    .pulse-ring {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
     
-    @keyframes floating {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
+    @keyframes pulse-ring {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
     }
   </style>
 </head>
 <body class="text-slate-800">
 
   <!-- Header dengan Gradient -->
-  <header class="glass-effect shadow-2xl sticky top-0 z-40">
+  <header class="glass-effect shadow-lg sticky top-0 z-40">
+    <div class="gradient-blue-yellow h-1"></div>
     <div class="container mx-auto px-4 py-4">
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-4">
-          <div class="w-14 h-14 gradient-card rounded-2xl flex items-center justify-center shadow-lg floating">
-            <i class="fa-solid fa-graduation-cap text-white text-2xl"></i>
+          <div class="w-14 h-14 rounded-xl gradient-blue-yellow flex items-center justify-center shadow-lg animate-pulse">
+            <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
           </div>
           <div>
-            <h1 class="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              DATA RAPOR SISWA
+            <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              SISTEM MANAJEMEN RAPOR
             </h1>
-            <p class="text-sm text-slate-500 font-medium">Kelas X AKL - Semester Genap</p>
+            <p class="text-sm text-slate-600 font-medium">Kelas X Akuntansi Keuangan Lembaga</p>
           </div>
         </div>
         
         <div class="relative w-full md:w-80">
-          <input type="text" id="searchInput" placeholder="Cari nama atau NIS siswa..." 
-            class="w-full pl-12 pr-4 py-3 rounded-xl text-sm glass-effect border-0 transition-all duration-300">
-          <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 text-sm"></i>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Cari nama atau NIS siswa..." 
+            class="w-full pl-11 pr-4 py-3 rounded-xl text-sm border-2 border-blue-100 focus:border-blue-400 focus:outline-none shadow-sm transition bg-white"
+          >
+          <i class="fa-solid fa-search absolute left-4 top-3.5 text-blue-400 text-sm"></i>
         </div>
       </div>
     </div>
@@ -157,231 +175,272 @@
 
   <main class="container mx-auto px-4 py-8">
     
-    <!-- Stats Cards dengan Gradient -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 animate-in">
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate-in">
       
       <!-- Total Siswa -->
-      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-20 h-20 gradient-blue opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="relative z-10">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Total Siswa</p>
-          <p id="statTotal" class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">0</p>
-          <div class="mt-3 flex items-center gap-2">
-            <div class="w-8 h-8 gradient-blue rounded-lg flex items-center justify-center">
-              <i class="fa-solid fa-users text-white text-xs"></i>
-            </div>
-            <span class="text-xs text-slate-500 font-medium">Terdaftar</span>
+      <div class="stat-card bg-white p-6 rounded-2xl shadow-lg border-l-4 border-blue-500 card-hover">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-users text-white text-xl"></i>
           </div>
+          <div class="w-3 h-3 rounded-full bg-blue-500 pulse-ring"></div>
         </div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Total Siswa</p>
+        <p id="statTotal" class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">0</p>
       </div>
-
+      
       <!-- Rapor Terisi -->
-      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-20 h-20 gradient-purple opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="relative z-10">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Rapor Terisi</p>
-          <div class="flex items-end gap-2">
-            <p id="statRapor" class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">0</p>
-            <span class="text-sm text-slate-400 mb-2">/ <span class="statTotalRef font-semibold">0</span></span>
+      <div class="stat-card bg-white p-6 rounded-2xl shadow-lg border-l-4 border-purple-500 card-hover">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-file-alt text-white text-xl"></i>
           </div>
-          <div class="mt-3 flex items-center gap-2">
-            <div class="w-8 h-8 gradient-purple rounded-lg flex items-center justify-center">
-              <i class="fa-solid fa-file-alt text-white text-xs"></i>
-            </div>
-            <span class="text-xs text-slate-500 font-medium">Dokumen</span>
-          </div>
+          <div class="w-3 h-3 rounded-full bg-purple-500 pulse-ring"></div>
+        </div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Rapor Terisi</p>
+        <div class="flex items-baseline gap-2">
+          <p id="statRapor" class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">0</p>
+          <span class="text-sm text-slate-400 font-medium">/ <span class="statTotalRef">0</span></span>
         </div>
       </div>
-
+      
       <!-- Identitas Terisi -->
-      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-20 h-20 gradient-green opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="relative z-10">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Identitas Terisi</p>
-          <div class="flex items-end gap-2">
-            <p id="statIdentitas" class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">0</p>
-            <span class="text-sm text-slate-400 mb-2">/ <span class="statTotalRef font-semibold">0</span></span>
+      <div class="stat-card bg-white p-6 rounded-2xl shadow-lg border-l-4 border-emerald-500 card-hover">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-id-card text-white text-xl"></i>
           </div>
-          <div class="mt-3 flex items-center gap-2">
-            <div class="w-8 h-8 gradient-green rounded-lg flex items-center justify-center">
-              <i class="fa-solid fa-id-card text-white text-xs"></i>
-            </div>
-            <span class="text-xs text-slate-500 font-medium">Profil</span>
-          </div>
+          <div class="w-3 h-3 rounded-full bg-emerald-500 pulse-ring"></div>
+        </div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Identitas Terisi</p>
+        <div class="flex items-baseline gap-2">
+          <p id="statIdentitas" class="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">0</p>
+          <span class="text-sm text-slate-400 font-medium">/ <span class="statTotalRef">0</span></span>
         </div>
       </div>
-
+      
       <!-- File Ledger -->
-      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-20 h-20 gradient-orange opacity-20 rounded-full -mr-10 -mt-10"></div>
-        <div class="relative z-10">
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">File Ledger</p>
-          <p id="ledgerStatus" class="text-sm font-bold text-red-500 mt-3 truncate">Belum Ada</p>
-          <div class="mt-3 flex gap-2">
-            <button onclick="document.getElementById('ledgerInput').click()" 
-              class="flex-1 gradient-blue text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <i class="fa-solid fa-upload mr-1"></i> Upload
+      <div class="stat-card bg-white p-6 rounded-2xl shadow-lg border-l-4 border-yellow-500 card-hover">
+        <div class="flex items-center justify-between mb-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-yellow-600 flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-book text-white text-xl"></i>
+          </div>
+          <div class="flex gap-1">
+            <button 
+              onclick="document.getElementById('ledgerInput').click()" 
+              class="w-8 h-8 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition shadow-sm"
+              title="Upload Ledger"
+            >
+              <i class="fa-solid fa-upload text-xs"></i>
             </button>
-            <a id="btnViewLedger" href="#" target="_blank" 
-              class="hidden w-10 h-10 gradient-green flex items-center justify-center rounded-lg text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <i class="fa-solid fa-eye"></i>
+            <a 
+              id="btnViewLedger" 
+              href="#" 
+              target="_blank" 
+              class="hidden w-8 h-8 flex items-center justify-center bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition shadow-sm"
+              title="Lihat Ledger"
+            >
+              <i class="fa-solid fa-eye text-xs"></i>
             </a>
           </div>
-          <input type="file" id="ledgerInput" accept="application/pdf" class="hidden" onchange="uploadLedger(this)">
         </div>
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">File Ledger</p>
+        <p id="ledgerStatus" class="text-sm font-bold text-red-500 truncate">Belum Ada</p>
+        <input type="file" id="ledgerInput" accept="application/pdf" class="hidden" onchange="uploadLedger(this)">
       </div>
+      
     </div>
 
-    <!-- Header Daftar Siswa -->
-    <div class="flex justify-between items-center mb-6 animate-in">
+    <!-- Section Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div>
-        <h2 class="text-2xl font-bold text-white mb-1">Daftar Siswa</h2>
-        <div class="h-1 w-20 gradient-card rounded-full"></div>
+        <h2 class="text-2xl font-bold text-slate-800 mb-1">Daftar Siswa</h2>
+        <div class="h-1 w-20 gradient-blue-yellow rounded-full"></div>
       </div>
-      <div class="flex gap-3">
-        <button onclick="refreshAllStatus()" id="btnRefresh" class="bg-white/20 hover:bg-white/30 text-white px-4 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 transition-all backdrop-blur-sm border border-white/30">
-          <i class="fa-solid fa-sync-alt"></i> 
-          <span class="hidden md:inline">Refresh Status</span>
-        </button>
-        <button onclick="openAddModal()" class="btn-primary text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-3 hover:gap-4 transition-all">
-          <i class="fa-solid fa-user-plus"></i> 
-          <span>Tambah Siswa</span>
-        </button>
-      </div>
+      <button 
+        onclick="openAddModal()" 
+        class="btn-gradient text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 w-full sm:w-auto justify-center"
+      >
+        <i class="fa-solid fa-user-plus"></i>
+        <span>Tambah Siswa Baru</span>
+      </button>
     </div>
 
-    <!-- Loading -->
-    <div id="loading" class="text-center py-16 hidden">
-      <div class="inline-block w-16 h-16 gradient-card rounded-full animate-spin">
-        <div class="w-14 h-14 bg-white rounded-full m-1"></div>
+    <!-- Loading State -->
+    <div id="loading" class="text-center py-16 hidden animate-in">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full gradient-blue-yellow animate-spin flex items-center justify-center">
+        <div class="w-12 h-12 bg-white rounded-full"></div>
       </div>
-      <p class="text-sm text-white font-medium mt-4">Memuat data...</p>
+      <p class="text-sm font-medium text-slate-600">Memuat data siswa...</p>
     </div>
 
     <!-- Student Grid -->
     <div id="studentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in"></div>
+    
   </main>
 
-  <!-- Modal Tambah Siswa -->
+  <!-- Add Student Modal -->
   <div id="addModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="glass-effect w-full max-w-md rounded-3xl p-8 shadow-2xl transform transition-all">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-12 h-12 gradient-card rounded-xl flex items-center justify-center">
-          <i class="fa-solid fa-user-plus text-white"></i>
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl transform animate-scale">
+      <div class="gradient-blue-yellow h-2 rounded-t-2xl"></div>
+      <div class="p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 rounded-xl gradient-blue-yellow flex items-center justify-center shadow-lg">
+            <i class="fa-solid fa-user-plus text-white text-xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-slate-800">Tambah Siswa Baru</h3>
         </div>
-        <h3 class="text-2xl font-bold text-slate-800">Tambah Siswa Baru</h3>
-      </div>
-      
-      <div class="space-y-4">
-        <div>
-          <label class="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-2">Nama Lengkap</label>
-          <input type="text" id="newNama" 
-            class="w-full border-2 border-slate-200 p-3 rounded-xl text-sm focus:border-purple-500 transition-all">
+        
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-2">Nama Lengkap</label>
+            <input 
+              type="text" 
+              id="newNama" 
+              class="w-full border-2 border-slate-200 focus:border-blue-400 p-3 rounded-xl text-sm outline-none transition"
+              placeholder="Masukkan nama lengkap siswa"
+            >
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-2">Nomor Induk Siswa (NIS)</label>
+            <input 
+              type="number" 
+              id="newNis" 
+              class="w-full border-2 border-slate-200 focus:border-blue-400 p-3 rounded-xl text-sm outline-none transition"
+              placeholder="Masukkan NIS"
+            >
+          </div>
         </div>
-        <div>
-          <label class="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-2">NIS</label>
-          <input type="number" id="newNis" 
-            class="w-full border-2 border-slate-200 p-3 rounded-xl text-sm focus:border-purple-500 transition-all">
+        
+        <div class="flex gap-3 mt-6">
+          <button 
+            onclick="document.getElementById('addModal').classList.add('hidden')" 
+            class="flex-1 px-4 py-3 text-slate-600 hover:bg-slate-100 rounded-xl text-sm font-bold transition border-2 border-slate-200"
+          >
+            Batal
+          </button>
+          <button 
+            onclick="addStudent()" 
+            id="btnAddSave" 
+            class="flex-1 px-4 py-3 btn-gradient text-white rounded-xl text-sm font-bold shadow-lg"
+          >
+            Simpan Data
+          </button>
         </div>
-      </div>
-      
-      <div class="flex gap-3 mt-8">
-        <button onclick="document.getElementById('addModal').classList.add('hidden')" 
-          class="flex-1 px-6 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-bold transition-all">
-          Batal
-        </button>
-        <button onclick="addStudent()" id="btnAddSave" 
-          class="flex-1 btn-primary text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg">
-          <i class="fa-solid fa-check mr-2"></i>Simpan
-        </button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Detail -->
-  <div id="detailModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="glass-effect w-full max-w-6xl h-[90vh] rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
+  <!-- Detail Modal -->
+  <div id="detailModal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-2 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-6xl h-[90vh] rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-2xl animate-scale">
       
       <!-- Sidebar -->
-      <div class="w-full md:w-96 bg-gradient-to-br from-slate-50 to-white p-8 border-r flex flex-col overflow-y-auto">
-        <div class="mb-8">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 gradient-card rounded-xl flex items-center justify-center">
+      <div class="w-full md:w-96 bg-gradient-to-br from-slate-50 to-blue-50 p-6 border-r flex flex-col overflow-y-auto">
+        
+        <!-- Student Info -->
+        <div class="mb-6 p-4 bg-white rounded-xl shadow-sm">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-12 h-12 rounded-xl gradient-blue-yellow flex items-center justify-center shadow-lg">
               <i class="fa-solid fa-user text-white text-xl"></i>
             </div>
             <div class="flex-1">
-              <h3 id="modalNama" class="text-xl font-bold text-slate-800">Nama Siswa</h3>
+              <h3 id="modalNama" class="text-lg font-bold text-slate-800 leading-tight">Nama Siswa</h3>
               <p id="modalNis" class="text-sm text-slate-500 font-mono mt-1">NIS: -</p>
             </div>
           </div>
         </div>
 
         <!-- Upload Section -->
-        <div class="glass-effect p-6 rounded-2xl border shadow-sm mb-6">
-          <label class="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-4">Upload Dokumen</label>
-          <select id="uploadType" class="w-full border-2 border-slate-200 p-3 rounded-xl text-sm mb-4 focus:border-purple-500 transition-all">
+        <div class="bg-white p-5 rounded-xl shadow-sm mb-4 border-2 border-dashed border-blue-200">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wide block mb-3">
+            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload Dokumen
+          </label>
+          
+          <select 
+            id="uploadType" 
+            class="w-full border-2 border-slate-200 focus:border-blue-400 p-3 rounded-xl text-sm mb-3 bg-white outline-none transition"
+          >
             <option value="Rapor">📄 File Rapor</option>
             <option value="Identitas">🆔 File Identitas</option>
           </select>
           
           <input type="file" id="fileInput" accept="application/pdf" class="hidden">
-          <label for="fileInput" class="block w-full text-center py-8 border-2 border-dashed border-purple-300 rounded-xl cursor-pointer hover:bg-purple-50 transition-all mb-3 group">
-            <i class="fa-solid fa-cloud-arrow-up text-purple-500 text-3xl mb-2 group-hover:scale-110 transition-transform inline-block"></i>
-            <p class="text-sm text-slate-600 font-medium">Pilih File PDF</p>
+          <label 
+            for="fileInput" 
+            class="block w-full text-center py-6 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer hover:bg-blue-50 transition mb-3 bg-gradient-to-br from-blue-50/50 to-yellow-50/50"
+          >
+            <i class="fa-solid fa-file-pdf text-blue-500 text-3xl mb-2"></i>
+            <p class="text-sm font-medium text-slate-600">Klik untuk pilih file PDF</p>
             <p class="text-xs text-slate-400 mt-1">Maksimal 10MB</p>
           </label>
           
-          <p id="fileNameDisplay" class="text-xs text-center text-slate-500 truncate mb-3 h-5"></p>
+          <p id="fileNameDisplay" class="text-xs text-center text-slate-600 truncate mb-3 h-5 font-medium"></p>
           
-          <button onclick="uploadFile()" id="btnUpload" 
-            class="w-full btn-primary text-white py-3 rounded-xl text-sm font-bold shadow-lg">
-            <i class="fa-solid fa-upload mr-2"></i>Upload File
+          <button 
+            onclick="uploadFile()" 
+            id="btnUpload" 
+            class="w-full btn-gradient text-white py-3 rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2"
+          >
+            <i class="fa-solid fa-upload"></i>
+            <span>Upload Dokumen</span>
           </button>
         </div>
 
         <!-- Action Buttons -->
-        <a id="btnDrive" href="#" target="_blank" 
-          class="flex items-center justify-center py-3 glass-effect border-2 text-slate-600 rounded-xl text-sm font-bold mb-4 hover:border-purple-400 hover:text-purple-600 transition-all group">
-          <i class="fa-brands fa-google-drive mr-2 text-lg group-hover:scale-110 transition-transform"></i> Buka di Drive
+        <a 
+          id="btnDrive" 
+          href="#" 
+          target="_blank" 
+          class="flex items-center justify-center py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-sm font-bold mb-3 hover:bg-slate-50 transition shadow-sm"
+        >
+          <i class="fa-brands fa-google-drive mr-2 text-lg"></i> 
+          Buka Folder Drive
         </a>
 
-        <button onclick="deleteStudent()" 
-          class="text-red-500 hover:text-white hover:bg-red-500 text-sm font-bold border-2 border-red-300 p-3 rounded-xl transition-all group">
-          <i class="fa-solid fa-trash mr-2 group-hover:scale-110 transition-transform inline-block"></i> Hapus Data Siswa
+        <button 
+          onclick="deleteStudent()" 
+          class="mt-auto text-red-600 hover:text-white hover:bg-red-600 text-sm font-bold border-2 border-red-200 p-3 rounded-xl transition w-full shadow-sm"
+        >
+          <i class="fa-solid fa-trash mr-2"></i> Hapus Data Siswa
         </button>
       </div>
 
       <!-- Preview Area -->
       <div class="flex-1 bg-slate-100 relative">
         <iframe id="previewFrame" class="w-full h-full" src=""></iframe>
-        <button onclick="closeDetail()" 
-          class="absolute top-4 right-4 bg-white text-slate-800 w-12 h-12 rounded-2xl shadow-xl flex items-center justify-center hover:bg-red-500 hover:text-white hover:rotate-90 transition-all duration-300 z-10">
-          <i class="fa-solid fa-times text-xl"></i>
+        <button 
+          onclick="closeDetail()" 
+          class="absolute top-4 right-4 bg-white text-slate-700 w-10 h-10 rounded-xl shadow-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition z-10"
+        >
+          <i class="fa-solid fa-times text-lg"></i>
         </button>
       </div>
+      
     </div>
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-8 right-8 hidden px-8 py-4 rounded-2xl shadow-2xl text-white z-[70] flex items-center gap-4 transition-all transform"></div>
+  <div id="toast" class="fixed bottom-6 right-6 hidden px-6 py-4 rounded-xl shadow-2xl text-white z-[70] flex items-center gap-3 transition-all animate-scale"></div>
 
   <script>
-    const APP_URL = "https://script.google.com/macros/s/AKfycby3YUcLawZiZcBhDi-s6sLRcnP9oGZIKeMXgKqQ_aSnALX1FR4yu_r2EFzLkciKsWil5A/exec"; 
+    const APP_URL = "https://script.google.com/macros/s/AKfycbzksZa0wzjtKi_O4qxkQIAN-jkNsliZ5UKIp1QTFndWdQARZMyVrrrZbjcNIjqao9y_/exec";
 
     let students = [];
     let currentStudent = null;
 
     document.addEventListener("DOMContentLoaded", () => {
         if(APP_URL.includes("MASUKKAN_URL")) { 
-            alert("PERINGATAN: URL Web App belum diisi!"); 
+            alert("PERINGATAN: URL Web App belum diisi di index.html!"); 
         }
         loadData();
         checkLedger();
         document.getElementById("searchInput").addEventListener("input", handleSearch);
         document.getElementById("fileInput").addEventListener("change", (e) => {
-             if(e.target.files[0]) {
-                 document.getElementById("fileNameDisplay").innerText = "📎 " + e.target.files[0].name;
-             }
+            if(e.target.files[0]) {
+                document.getElementById("fileNameDisplay").innerText = "📎 " + e.target.files[0].name;
+            }
         });
     });
 
@@ -397,7 +456,7 @@
                 checkFileStatusLazy(students);
             }
         } catch(e) { 
-            showToast("❌ Gagal memuat data", true); 
+            showToast("Gagal memuat data", true); 
         } finally { 
             toggleLoading(false); 
         }
@@ -417,126 +476,26 @@
                 const badgeEl = document.getElementById(`badge-${s.row}`);
                 if(badgeEl) {
                     badgeEl.innerHTML = `
-                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasIdentitas ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
-                            ${res.hasIdentitas ? '✓' : '✗'} ID
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold ${res.hasIdentitas ? 'bg-emerald-100 text-emerald-700 border border-emerald-300' : 'bg-red-50 text-red-400 border border-red-200'}">
+                            <i class="fa-solid fa-id-card mr-1"></i> Identitas
                         </span>
-                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasRapor ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
-                            ${res.hasRapor ? '✓' : '✗'} Rapor
-                        </span>
-                    `;
-                }
-            } catch(e) {
-                console.error("Error checking status:", e);
-            }
-        }
-    }
-
-    // Fungsi baru untuk update status satu siswa
-    async function updateSingleStudentStatus(student) {
-        try {
-            const res = await fetchCall("check_status", { folderId: student.folder_id }, true);
-            console.log(`Status check for ${student.nama}:`, res);
-            
-            const badgeEl = document.getElementById(`badge-${student.row}`);
-            if(badgeEl) {
-                badgeEl.innerHTML = `
-                    <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasIdentitas ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
-                        ${res.hasIdentitas ? '✓' : '✗'} ID
-                    </span>
-                    <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasRapor ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
-                        ${res.hasRapor ? '✓' : '✗'} Rapor
-                    </span>
-                `;
-            }
-            return res;
-        } catch(e) {
-            console.error("Error updating status:", e);
-            return { hasRapor: false, hasIdentitas: false };
-        }
-    }
-
-    // Fungsi dengan retry mechanism
-    async function updateSingleStudentStatusWithRetry(student, retries = 3) {
-        for(let i = 0; i < retries; i++) {
-            try {
-                console.log(`Attempt ${i + 1} to check status for ${student.nama}`);
-                const res = await fetchCall("check_status", { folderId: student.folder_id }, true);
-                console.log(`Status check result:`, res);
-                
-                const badgeEl = document.getElementById(`badge-${student.row}`);
-                if(badgeEl) {
-                    badgeEl.innerHTML = `
-                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasIdentitas ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
-                            ${res.hasIdentitas ? '✓' : '✗'} ID
-                        </span>
-                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasRapor ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
-                            ${res.hasRapor ? '✓' : '✗'} Rapor
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold ${res.hasRapor ? 'bg-purple-100 text-purple-700 border border-purple-300' : 'bg-red-50 text-red-400 border border-red-200'}">
+                            <i class="fa-solid fa-file-alt mr-1"></i> Rapor
                         </span>
                     `;
                 }
-                
-                // Jika sudah berhasil detect file, break
-                if(res.hasRapor || res.hasIdentitas) {
-                    console.log("File detected successfully!");
-                    return res;
-                }
-                
-                // Jika belum terdetect, tunggu 1 detik sebelum retry
-                if(i < retries - 1) {
-                    console.log("File not detected yet, retrying in 1 second...");
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
-            } catch(e) {
-                console.error(`Error on attempt ${i + 1}:`, e);
-                if(i === retries - 1) throw e;
-            }
-        }
-        return { hasRapor: false, hasIdentitas: false };
-    }
-
-    // Refresh global stats
-    async function refreshGlobalStats() {
-        let countRapor = 0, countIdentitas = 0;
-        for(const s of students) {
-            try {
-                const res = await fetchCall("check_status", { folderId: s.folder_id }, true);
-                if(res.hasRapor) countRapor++;
-                if(res.hasIdentitas) countIdentitas++;
-            } catch(e) {
-                console.error("Error refreshing stats:", e);
-            }
-        }
-        document.getElementById("statRapor").innerText = countRapor;
-        document.getElementById("statIdentitas").innerText = countIdentitas;
-    }
-
-    // Fungsi refresh manual semua status
-    async function refreshAllStatus() {
-        const btn = document.getElementById("btnRefresh");
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-sync-alt fa-spin"></i> <span class="hidden md:inline">Memuat...</span>';
-        btn.disabled = true;
-        
-        try {
-            showToast("🔄 Memperbarui semua status...");
-            await checkFileStatusLazy(students);
-            showToast("✅ Status berhasil diperbarui!");
-        } catch(e) {
-            showToast("❌ Gagal refresh status", true);
-            console.error("Refresh error:", e);
-        } finally {
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
+            } catch(e) {}
         }
     }
 
     async function addStudent() {
         const nama = document.getElementById("newNama").value;
         const nis = document.getElementById("newNis").value;
-        if(!nama) return showToast("⚠️ Nama harus diisi!", true);
+        if(!nama) return showToast("Nama siswa harus diisi!", true);
+        if(!nis) return showToast("NIS harus diisi!", true);
         
         const btn = document.getElementById("btnAddSave");
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Proses...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Menyimpan...';
         btn.disabled = true;
 
         try {
@@ -544,12 +503,12 @@
             document.getElementById("addModal").classList.add("hidden");
             document.getElementById("newNama").value = "";
             document.getElementById("newNis").value = "";
-            showToast("✅ Siswa berhasil ditambahkan!");
+            showToast("Siswa berhasil ditambahkan!");
             loadData();
         } catch(e) { 
-            showToast("❌ Gagal menambah siswa", true); 
+            showToast("Gagal menambahkan siswa", true); 
         } finally { 
-            btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Simpan';
+            btn.innerHTML = "Simpan Data";
             btn.disabled = false; 
         }
     }
@@ -557,63 +516,44 @@
     async function uploadFile() {
         const file = document.getElementById("fileInput").files[0];
         const type = document.getElementById("uploadType").value;
-        if(!file) return showToast("⚠️ Pilih file PDF terlebih dahulu", true);
+        if(!file) return showToast("Pilih file PDF terlebih dahulu", true);
 
         const btn = document.getElementById("btnUpload");
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Uploading...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengupload...';
         btn.disabled = true;
 
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async () => {
             try {
-                const uploadResult = await fetchCall("upload", {
+                await fetchCall("upload", {
                     folderId: currentStudent.folder_id,
                     fileName: `${type}_${currentStudent.nama}.pdf`,
                     mimeType: "application/pdf",
                     fileData: reader.result.split(",")[1]
                 });
-                
-                console.log("Upload result:", uploadResult);
-                showToast("✅ File berhasil diupload!");
-                
+                showToast("File berhasil diupload!");
                 document.getElementById("fileInput").value = "";
                 document.getElementById("fileNameDisplay").innerText = "";
-                
-                // Refresh preview dengan timestamp untuk force reload
-                const previewFrame = document.getElementById("previewFrame");
-                const currentSrc = previewFrame.src.split('?')[0];
-                previewFrame.src = currentSrc + '?t=' + new Date().getTime();
-                
-                // Tunggu sebentar agar Google Drive sinkron
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                // Update badge status untuk siswa ini dengan retry
-                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Memperbarui status...';
-                await updateSingleStudentStatusWithRetry(currentStudent);
-                
-                // Refresh statistik global
-                await refreshGlobalStats();
-                
+                document.getElementById("previewFrame").src = document.getElementById("previewFrame").src;
             } catch(e) { 
-                showToast("❌ Gagal upload file", true); 
-                console.error("Upload error:", e);
+                showToast("Gagal mengupload file", true); 
             } finally { 
-                btn.innerHTML = '<i class="fa-solid fa-upload mr-2"></i>Upload File';
+                btn.innerHTML = '<i class="fa-solid fa-upload mr-2"></i> Upload Dokumen';
                 btn.disabled = false; 
             }
         };
     }
 
     async function deleteStudent() {
-        if(!confirm(`Yakin ingin menghapus data ${currentStudent.nama}?`)) return;
+        if(!confirm(`Apakah Anda yakin ingin menghapus data ${currentStudent.nama}?`)) return;
         try {
             await fetchCall("delete", { row: currentStudent.row });
             closeDetail();
-            showToast("✅ Data berhasil dihapus");
+            showToast("Data siswa berhasil dihapus");
             loadData();
         } catch(e) { 
-            showToast("❌ Gagal menghapus data", true); 
+            showToast("Gagal menghapus data", true); 
         }
     }
 
@@ -623,13 +563,13 @@
             const el = document.getElementById("ledgerStatus");
             const btn = document.getElementById("btnViewLedger");
             if(res.hasFile) {
-                el.innerHTML = `<span class="text-green-600">✓</span> ${res.fileName}`;
-                el.className = "text-sm font-bold text-green-600 mt-3 truncate";
+                el.innerText = "📗 " + res.fileName;
+                el.className = "text-sm font-bold text-emerald-600 truncate";
                 btn.href = res.fileUrl;
                 btn.classList.remove("hidden");
             } else {
-                el.innerHTML = '<span class="text-red-500">✗</span> Belum Ada';
-                el.className = "text-sm font-bold text-red-500 mt-3";
+                el.innerText = "Belum Ada";
+                el.className = "text-sm font-bold text-red-500";
                 btn.classList.add("hidden");
             }
         } catch(e){}
@@ -641,7 +581,7 @@
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = async () => {
-            showToast("📤 Mengupload Ledger...");
+            showToast("Mengupload Ledger...");
             try {
                 await fetchCall("upload", {
                     folderId: "LEDGER",
@@ -649,47 +589,61 @@
                     mimeType: "application/pdf",
                     fileData: reader.result.split(",")[1]
                 });
-                showToast("✅ Ledger berhasil diupload!");
+                showToast("Ledger berhasil diupload!");
                 checkLedger();
             } catch(e) { 
-                showToast("❌ Gagal upload Ledger", true); 
+                showToast("Gagal mengupload Ledger", true); 
             }
         };
     }
 
     function renderGrid(data) {
         const grid = document.getElementById("studentGrid");
-        grid.innerHTML = "";
-        
         if(data.length === 0) {
             grid.innerHTML = `
                 <div class="col-span-full text-center py-16">
-                    <i class="fa-solid fa-users text-white text-6xl opacity-20 mb-4"></i>
-                    <p class="text-white text-lg font-medium">Belum ada data siswa</p>
+                    <i class="fa-solid fa-inbox text-6xl text-slate-300 mb-4"></i>
+                    <p class="text-slate-500 font-medium">Belum ada data siswa</p>
+                    <p class="text-sm text-slate-400 mt-2">Klik "Tambah Siswa Baru" untuk memulai</p>
                 </div>
             `;
             return;
         }
         
-        data.forEach(s => {
+        grid.innerHTML = "";
+        data.forEach((s, index) => {
             const div = document.createElement("div");
-            div.className = "glass-effect p-6 rounded-2xl shadow-xl card-hover cursor-pointer group relative overflow-hidden";
+            div.className = "bg-white p-6 rounded-2xl shadow-md hover:shadow-xl cursor-pointer transition-all card-hover group relative overflow-hidden border border-slate-100";
             div.onclick = () => openDetail(s);
+            
+            // Gradient accent
+            const colors = ['blue', 'purple', 'emerald', 'yellow'];
+            const color = colors[index % colors.length];
+            
             div.innerHTML = `
-                <div class="absolute left-0 top-0 bottom-0 w-1.5 gradient-card rounded-r-full"></div>
-                <div class="pl-2">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-slate-700 text-lg mb-1 group-hover:text-purple-600 transition-colors">${s.nama}</h4>
-                            <p class="text-xs text-slate-400 font-mono bg-slate-100 inline-block px-3 py-1 rounded-lg">NIS: ${s.nis}</p>
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-${color}-400 to-${color}-600"></div>
+                
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-${color}-100 to-${color}-200 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-user-graduate text-${color}-600 text-xl"></i>
                         </div>
-                        <div class="text-purple-300 group-hover:text-purple-600 group-hover:translate-x-1 transition-all">
-                            <i class="fa-solid fa-chevron-right text-xl"></i>
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-lg group-hover:text-${color}-600 transition">${s.nama}</h4>
+                            <p class="text-xs text-slate-500 font-mono bg-slate-50 px-2 py-1 rounded mt-1 inline-block">
+                                <i class="fa-solid fa-id-badge mr-1"></i> NIS: ${s.nis}
+                            </p>
                         </div>
                     </div>
-                    <div id="badge-${s.row}" class="flex gap-2 flex-wrap">
-                        <span class="text-xs bg-slate-100 text-slate-400 px-3 py-1.5 rounded-lg animate-pulse">⏳ Memuat status...</span>
+                    <div class="text-slate-300 group-hover:text-${color}-500 transition-colors">
+                        <i class="fa-solid fa-chevron-right text-xl"></i>
                     </div>
+                </div>
+                
+                <div id="badge-${s.row}" class="flex flex-wrap gap-2">
+                    <span class="text-xs bg-slate-100 text-slate-400 px-3 py-1.5 rounded-lg animate-pulse border border-slate-200">
+                        <i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengecek file...
+                    </span>
                 </div>
             `;
             grid.appendChild(div);
@@ -725,66 +679,47 @@
     
     function handleSearch(e) { 
         const v = e.target.value.toLowerCase(); 
-        renderGrid(students.filter(s => s.nama.toLowerCase().includes(v) || s.nis.toString().includes(v))); 
+        const filtered = students.filter(s => 
+            s.nama.toLowerCase().includes(v) || 
+            s.nis.toString().includes(v)
+        );
+        renderGrid(filtered);
     }
     
     function showToast(msg, err=false) {
         const t = document.getElementById("toast");
-        t.innerHTML = msg;
-        t.className = `fixed bottom-8 right-8 px-8 py-4 rounded-2xl shadow-2xl text-white z-[70] flex items-center gap-4 transition-all transform ${err ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-green-500 to-emerald-600'}`;
-        t.classList.remove("hidden");
-        t.style.animation = 'slideInRight 0.3s ease-out';
-        setTimeout(() => {
-            t.style.animation = 'slideOutRight 0.3s ease-in';
-            setTimeout(() => t.classList.add("hidden"), 300);
-        }, 3000);
+        t.innerHTML = `
+            ${err 
+                ? '<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-exclamation-triangle text-xl"></i></div>' 
+                : '<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-check-circle text-xl"></i></div>'
+            }
+            <span class="font-medium">${msg}</span>
+        `;
+        t.className = `fixed bottom-6 right-6 px-6 py-4 rounded-xl shadow-2xl text-white z-[70] flex items-center gap-3 transition-all animate-scale ${err ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-emerald-500 to-emerald-600'}`;
+        t.classList.remove("hidden"); 
+        setTimeout(() => t.classList.add("hidden"), 3000);
     }
 
     function fetchCall(action, payload={}, isGet=false) {
         return new Promise((resolve, reject) => {
             const url = APP_URL;
-            console.log(`[API Call] Action: ${action}`, payload);
-            
             if(isGet) {
                 const params = new URLSearchParams({action, ...payload}).toString();
                 fetch(url + "?" + params)
-                    .then(r=>r.json())
-                    .then(data => {
-                        console.log(`[API Response] ${action}:`, data);
-                        resolve(data);
-                    })
-                    .catch(err => {
-                        console.error(`[API Error] ${action}:`, err);
-                        reject(err);
-                    });
+                    .then(r => r.json())
+                    .then(resolve)
+                    .catch(reject);
             } else {
                 fetch(url + "?action=" + action, { 
                     method: "POST", 
                     body: JSON.stringify(payload) 
                 })
-                    .then(r=>r.json())
-                    .then(data => {
-                        console.log(`[API Response] ${action}:`, data);
-                        resolve(data);
-                    })
-                    .catch(err => {
-                        console.error(`[API Error] ${action}:`, err);
-                        reject(err);
-                    });
+                    .then(r => r.json())
+                    .then(resolve)
+                    .catch(reject);
             }
         });
     }
   </script>
-  
-  <style>
-    @keyframes slideInRight {
-      from { transform: translateX(400px); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOutRight {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(400px); opacity: 0; }
-    }
-  </style>
 </body>
 </html>
