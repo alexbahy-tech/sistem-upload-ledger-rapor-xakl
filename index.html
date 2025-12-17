@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Kelas X AKL</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    body { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .gradient-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .gradient-purple {
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    }
+    
+    .gradient-blue {
+      background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+    }
+    
+    .gradient-green {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .gradient-orange {
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+    }
+    
+    .animate-in { 
+      animation: fadeInUp 0.5s ease-out;
+    }
+    
+    @keyframes fadeInUp { 
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      } 
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      } 
+    }
+    
+    .card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    ::-webkit-scrollbar { 
+      width: 8px; 
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    
+    ::-webkit-scrollbar-thumb { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 4px; 
+    }
+    
+    .stat-card {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: pulse 3s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    .badge-glow {
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    .floating {
+      animation: floating 3s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+  </style>
+</head>
+<body class="text-slate-800">
+
+  <!-- Header dengan Gradient -->
+  <header class="glass-effect shadow-2xl sticky top-0 z-40">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 gradient-card rounded-2xl flex items-center justify-center shadow-lg floating">
+            <i class="fa-solid fa-graduation-cap text-white text-2xl"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              DATA RAPOR SISWA
+            </h1>
+            <p class="text-sm text-slate-500 font-medium">Kelas X AKL - Semester Ganjil Tahun Pelajaran 2025/2026</p>
+          </div>
+        </div>
+        
+        <div class="relative w-full md:w-80">
+          <input type="text" id="searchInput" placeholder="Cari nama atau NIS siswa..." 
+            class="w-full pl-12 pr-4 py-3 rounded-xl text-sm glass-effect border-0 transition-all duration-300">
+          <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-purple-400 text-sm"></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    
+    <!-- Stats Cards dengan Gradient -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 animate-in">
+      
+      <!-- Total Siswa -->
+      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-20 h-20 gradient-blue opacity-20 rounded-full -mr-10 -mt-10"></div>
+        <div class="relative z-10">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Total Siswa</p>
+          <p id="statTotal" class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">0</p>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="w-8 h-8 gradient-blue rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-users text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-slate-500 font-medium">Terdaftar</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rapor Terisi -->
+      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-20 h-20 gradient-purple opacity-20 rounded-full -mr-10 -mt-10"></div>
+        <div class="relative z-10">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Rapor Terisi</p>
+          <div class="flex items-end gap-2">
+            <p id="statRapor" class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">0</p>
+            <span class="text-sm text-slate-400 mb-2">/ <span class="statTotalRef font-semibold">0</span></span>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="w-8 h-8 gradient-purple rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-file-alt text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-slate-500 font-medium">Dokumen</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Identitas Terisi -->
+      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-20 h-20 gradient-green opacity-20 rounded-full -mr-10 -mt-10"></div>
+        <div class="relative z-10">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Identitas Terisi</p>
+          <div class="flex items-end gap-2">
+            <p id="statIdentitas" class="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">0</p>
+            <span class="text-sm text-slate-400 mb-2">/ <span class="statTotalRef font-semibold">0</span></span>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="w-8 h-8 gradient-green rounded-lg flex items-center justify-center">
+              <i class="fa-solid fa-id-card text-white text-xs"></i>
+            </div>
+            <span class="text-xs text-slate-500 font-medium">Profil</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Ledger -->
+      <div class="stat-card glass-effect p-6 rounded-2xl shadow-xl card-hover relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-20 h-20 gradient-orange opacity-20 rounded-full -mr-10 -mt-10"></div>
+        <div class="relative z-10">
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">File Ledger</p>
+          <p id="ledgerStatus" class="text-sm font-bold text-red-500 mt-3 truncate">Belum Ada</p>
+          <div class="mt-3 flex gap-2">
+            <button onclick="document.getElementById('ledgerInput').click()" 
+              class="flex-1 gradient-blue text-white px-3 py-2 rounded-lg text-xs font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <i class="fa-solid fa-upload mr-1"></i> Upload
+            </button>
+            <a id="btnViewLedger" href="#" target="_blank" 
+              class="hidden w-10 h-10 gradient-green flex items-center justify-center rounded-lg text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <i class="fa-solid fa-eye"></i>
+            </a>
+          </div>
+          <input type="file" id="ledgerInput" accept="application/pdf" class="hidden" onchange="uploadLedger(this)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Header Daftar Siswa -->
+    <div class="flex justify-between items-center mb-6 animate-in">
+      <div>
+        <h2 class="text-2xl font-bold text-white mb-1">Daftar Siswa</h2>
+        <div class="h-1 w-20 gradient-card rounded-full"></div>
+      </div>
+      <button onclick="openAddModal()" class="btn-primary text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg flex items-center gap-3 hover:gap-4 transition-all">
+        <i class="fa-solid fa-user-plus"></i> 
+        <span>Tambah Siswa</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="text-center py-16 hidden">
+      <div class="inline-block w-16 h-16 gradient-card rounded-full animate-spin">
+        <div class="w-14 h-14 bg-white rounded-full m-1"></div>
+      </div>
+      <p class="text-sm text-white font-medium mt-4">Memuat data...</p>
+    </div>
+
+    <!-- Student Grid -->
+    <div id="studentGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in"></div>
+  </main>
+
+  <!-- Modal Tambah Siswa -->
+  <div id="addModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="glass-effect w-full max-w-md rounded-3xl p-8 shadow-2xl transform transition-all">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 gradient-card rounded-xl flex items-center justify-center">
+          <i class="fa-solid fa-user-plus text-white"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-slate-800">Tambah Siswa Baru</h3>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-2">Nama Lengkap</label>
+          <input type="text" id="newNama" 
+            class="w-full border-2 border-slate-200 p-3 rounded-xl text-sm focus:border-purple-500 transition-all">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-2">NIS</label>
+          <input type="number" id="newNis" 
+            class="w-full border-2 border-slate-200 p-3 rounded-xl text-sm focus:border-purple-500 transition-all">
+        </div>
+      </div>
+      
+      <div class="flex gap-3 mt-8">
+        <button onclick="document.getElementById('addModal').classList.add('hidden')" 
+          class="flex-1 px-6 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm font-bold transition-all">
+          Batal
+        </button>
+        <button onclick="addStudent()" id="btnAddSave" 
+          class="flex-1 btn-primary text-white px-6 py-3 rounded-xl text-sm font-bold shadow-lg">
+          <i class="fa-solid fa-check mr-2"></i>Simpan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detail -->
+  <div id="detailModal" class="fixed inset-0 bg-black/60 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="glass-effect w-full max-w-6xl h-[90vh] rounded-3xl overflow-hidden flex flex-col md:flex-row shadow-2xl">
+      
+      <!-- Sidebar -->
+      <div class="w-full md:w-96 bg-gradient-to-br from-slate-50 to-white p-8 border-r flex flex-col overflow-y-auto">
+        <div class="mb-8">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 gradient-card rounded-xl flex items-center justify-center">
+              <i class="fa-solid fa-user text-white text-xl"></i>
+            </div>
+            <div class="flex-1">
+              <h3 id="modalNama" class="text-xl font-bold text-slate-800">Nama Siswa</h3>
+              <p id="modalNis" class="text-sm text-slate-500 font-mono mt-1">NIS: -</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="glass-effect p-6 rounded-2xl border shadow-sm mb-6">
+          <label class="text-xs font-bold text-slate-400 uppercase tracking-wide block mb-4">Upload Dokumen</label>
+          <select id="uploadType" class="w-full border-2 border-slate-200 p-3 rounded-xl text-sm mb-4 focus:border-purple-500 transition-all">
+            <option value="Rapor">📄 File Rapor</option>
+            <option value="Identitas">🆔 File Identitas</option>
+          </select>
+          
+          <input type="file" id="fileInput" accept="application/pdf" class="hidden">
+          <label for="fileInput" class="block w-full text-center py-8 border-2 border-dashed border-purple-300 rounded-xl cursor-pointer hover:bg-purple-50 transition-all mb-3 group">
+            <i class="fa-solid fa-cloud-arrow-up text-purple-500 text-3xl mb-2 group-hover:scale-110 transition-transform inline-block"></i>
+            <p class="text-sm text-slate-600 font-medium">Pilih File PDF</p>
+            <p class="text-xs text-slate-400 mt-1">Maksimal 10MB</p>
+          </label>
+          
+          <p id="fileNameDisplay" class="text-xs text-center text-slate-500 truncate mb-3 h-5"></p>
+          
+          <button onclick="uploadFile()" id="btnUpload" 
+            class="w-full btn-primary text-white py-3 rounded-xl text-sm font-bold shadow-lg">
+            <i class="fa-solid fa-upload mr-2"></i>Upload File
+          </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <a id="btnDrive" href="#" target="_blank" 
+          class="flex items-center justify-center py-3 glass-effect border-2 text-slate-600 rounded-xl text-sm font-bold mb-4 hover:border-purple-400 hover:text-purple-600 transition-all group">
+          <i class="fa-brands fa-google-drive mr-2 text-lg group-hover:scale-110 transition-transform"></i> Buka di Drive
+        </a>
+
+        <button onclick="deleteStudent()" 
+          class="text-red-500 hover:text-white hover:bg-red-500 text-sm font-bold border-2 border-red-300 p-3 rounded-xl transition-all group">
+          <i class="fa-solid fa-trash mr-2 group-hover:scale-110 transition-transform inline-block"></i> Hapus Data Siswa
+        </button>
+      </div>
+
+      <!-- Preview Area -->
+      <div class="flex-1 bg-slate-100 relative">
+        <iframe id="previewFrame" class="w-full h-full" src=""></iframe>
+        <button onclick="closeDetail()" 
+          class="absolute top-4 right-4 bg-white text-slate-800 w-12 h-12 rounded-2xl shadow-xl flex items-center justify-center hover:bg-red-500 hover:text-white hover:rotate-90 transition-all duration-300 z-10">
+          <i class="fa-solid fa-times text-xl"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-8 right-8 hidden px-8 py-4 rounded-2xl shadow-2xl text-white z-[70] flex items-center gap-4 transition-all transform"></div>
+
+  <script>
+    const APP_URL = "https://script.google.com/macros/s/AKfycby3YUcLawZiZcBhDi-s6sLRcnP9oGZIKeMXgKqQ_aSnALX1FR4yu_r2EFzLkciKsWil5A/exec"; 
+
+    let students = [];
+    let currentStudent = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+        if(APP_URL.includes("MASUKKAN_URL")) { 
+            alert("PERINGATAN: URL Web App belum diisi!"); 
+        }
+        loadData();
+        checkLedger();
+        document.getElementById("searchInput").addEventListener("input", handleSearch);
+        document.getElementById("fileInput").addEventListener("change", (e) => {
+             if(e.target.files[0]) {
+                 document.getElementById("fileNameDisplay").innerText = "📎 " + e.target.files[0].name;
+             }
+        });
+    });
+
+    async function loadData() {
+        toggleLoading(true);
+        try {
+            const res = await fetchCall("read");
+            if(res.status === "success") {
+                students = res.data;
+                students.sort((a,b) => a.nama.localeCompare(b.nama));
+                updateStats(students.length);
+                renderGrid(students);
+                checkFileStatusLazy(students);
+            }
+        } catch(e) { 
+            showToast("❌ Gagal memuat data", true); 
+        } finally { 
+            toggleLoading(false); 
+        }
+    }
+
+    async function checkFileStatusLazy(data) {
+        let countRapor = 0, countIdentitas = 0;
+        for(const s of data) {
+            try {
+                const res = await fetchCall("check_status", { folderId: s.folder_id }, true);
+                if(res.hasRapor) countRapor++;
+                if(res.hasIdentitas) countIdentitas++;
+                
+                document.getElementById("statRapor").innerText = countRapor;
+                document.getElementById("statIdentitas").innerText = countIdentitas;
+                
+                const badgeEl = document.getElementById(`badge-${s.row}`);
+                if(badgeEl) {
+                    badgeEl.innerHTML = `
+                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasIdentitas ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
+                            ${res.hasIdentitas ? '✓' : '✗'} ID
+                        </span>
+                        <span class="text-xs px-3 py-1.5 rounded-lg font-semibold ${res.hasRapor ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg' : 'bg-red-100 text-red-400 border border-red-200'}">
+                            ${res.hasRapor ? '✓' : '✗'} Rapor
+                        </span>
+                    `;
+                }
+            } catch(e) {}
+        }
+    }
+
+    async function addStudent() {
+        const nama = document.getElementById("newNama").value;
+        const nis = document.getElementById("newNis").value;
+        if(!nama) return showToast("⚠️ Nama harus diisi!", true);
+        
+        const btn = document.getElementById("btnAddSave");
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Proses...';
+        btn.disabled = true;
+
+        try {
+            await fetchCall("add", { nama, nis });
+            document.getElementById("addModal").classList.add("hidden");
+            document.getElementById("newNama").value = "";
+            document.getElementById("newNis").value = "";
+            showToast("✅ Siswa berhasil ditambahkan!");
+            loadData();
+        } catch(e) { 
+            showToast("❌ Gagal menambah siswa", true); 
+        } finally { 
+            btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Simpan';
+            btn.disabled = false; 
+        }
+    }
+
+    async function uploadFile() {
+        const file = document.getElementById("fileInput").files[0];
+        const type = document.getElementById("uploadType").value;
+        if(!file) return showToast("⚠️ Pilih file PDF terlebih dahulu", true);
+
+        const btn = document.getElementById("btnUpload");
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Uploading...';
+        btn.disabled = true;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            try {
+                await fetchCall("upload", {
+                    folderId: currentStudent.folder_id,
+                    fileName: `${type}_${currentStudent.nama}.pdf`,
+                    mimeType: "application/pdf",
+                    fileData: reader.result.split(",")[1]
+                });
+                showToast("✅ File berhasil diupload!");
+                document.getElementById("fileInput").value = "";
+                document.getElementById("fileNameDisplay").innerText = "";
+                document.getElementById("previewFrame").src = document.getElementById("previewFrame").src;
+                loadData();
+            } catch(e) { 
+                showToast("❌ Gagal upload file", true); 
+            } finally { 
+                btn.innerHTML = '<i class="fa-solid fa-upload mr-2"></i>Upload File';
+                btn.disabled = false; 
+            }
+        };
+    }
+
+    async function deleteStudent() {
+        if(!confirm(`Yakin ingin menghapus data ${currentStudent.nama}?`)) return;
+        try {
+            await fetchCall("delete", { row: currentStudent.row });
+            closeDetail();
+            showToast("✅ Data berhasil dihapus");
+            loadData();
+        } catch(e) { 
+            showToast("❌ Gagal menghapus data", true); 
+        }
+    }
+
+    async function checkLedger() {
+        try {
+            const res = await fetchCall("check_ledger");
+            const el = document.getElementById("ledgerStatus");
+            const btn = document.getElementById("btnViewLedger");
+            if(res.hasFile) {
+                el.innerHTML = `<span class="text-green-600">✓</span> ${res.fileName}`;
+                el.className = "text-sm font-bold text-green-600 mt-3 truncate";
+                btn.href = res.fileUrl;
+                btn.classList.remove("hidden");
+            } else {
+                el.innerHTML = '<span class="text-red-500">✗</span> Belum Ada';
+                el.className = "text-sm font-bold text-red-500 mt-3";
+                btn.classList.add("hidden");
+            }
+        } catch(e){}
+    }
+
+    function uploadLedger(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = async () => {
+            showToast("📤 Mengupload Ledger...");
+            try {
+                await fetchCall("upload", {
+                    folderId: "LEDGER",
+                    fileName: "Ledger_X_AKL.pdf",
+                    mimeType: "application/pdf",
+                    fileData: reader.result.split(",")[1]
+                });
+                showToast("✅ Ledger berhasil diupload!");
+                checkLedger();
+            } catch(e) { 
+                showToast("❌ Gagal upload Ledger", true); 
+            }
+        };
+    }
+
+    function renderGrid(data) {
+        const grid = document.getElementById("studentGrid");
+        grid.innerHTML = "";
+        
+        if(data.length === 0) {
+            grid.innerHTML = `
+                <div class="col-span-full text-center py-16">
+                    <i class="fa-solid fa-users text-white text-6xl opacity-20 mb-4"></i>
+                    <p class="text-white text-lg font-medium">Belum ada data siswa</p>
+                </div>
+            `;
+            return;
+        }
+        
+        data.forEach(s => {
+            const div = document.createElement("div");
+            div.className = "glass-effect p-6 rounded-2xl shadow-xl card-hover cursor-pointer group relative overflow-hidden";
+            div.onclick = () => openDetail(s);
+            div.innerHTML = `
+                <div class="absolute left-0 top-0 bottom-0 w-1.5 gradient-card rounded-r-full"></div>
+                <div class="pl-2">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex-1">
+                            <h4 class="font-bold text-slate-700 text-lg mb-1 group-hover:text-purple-600 transition-colors">${s.nama}</h4>
+                            <p class="text-xs text-slate-400 font-mono bg-slate-100 inline-block px-3 py-1 rounded-lg">NIS: ${s.nis}</p>
+                        </div>
+                        <div class="text-purple-300 group-hover:text-purple-600 group-hover:translate-x-1 transition-all">
+                            <i class="fa-solid fa-chevron-right text-xl"></i>
+                        </div>
+                    </div>
+                    <div id="badge-${s.row}" class="flex gap-2 flex-wrap">
+                        <span class="text-xs bg-slate-100 text-slate-400 px-3 py-1.5 rounded-lg animate-pulse">⏳ Memuat status...</span>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+    }
+
+    function openDetail(s) {
+        currentStudent = s;
+        document.getElementById("modalNama").innerText = s.nama;
+        document.getElementById("modalNis").innerText = "NIS: " + s.nis;
+        document.getElementById("btnDrive").href = `https://drive.google.com/drive/folders/${s.folder_id}`;
+        document.getElementById("previewFrame").src = `https://drive.google.com/embeddedfolderview?id=${s.folder_id}#list`;
+        document.getElementById("detailModal").classList.remove("hidden");
+    }
+    
+    function closeDetail() { 
+        document.getElementById("detailModal").classList.add("hidden"); 
+        document.getElementById("previewFrame").src = ""; 
+    }
+    
+    function openAddModal() { 
+        document.getElementById("addModal").classList.remove("hidden"); 
+    }
+    
+    function toggleLoading(show) { 
+        document.getElementById("loading").classList.toggle("hidden", !show); 
+    }
+    
+    function updateStats(total) { 
+        document.getElementById("statTotal").innerText = total; 
+        document.querySelectorAll(".statTotalRef").forEach(e => e.innerText = total); 
+    }
+    
+    function handleSearch(e) { 
+        const v = e.target.value.toLowerCase(); 
+        renderGrid(students.filter(s => s.nama.toLowerCase().includes(v) || s.nis.toString().includes(v))); 
+    }
+    
+    function showToast(msg, err=false) {
+        const t = document.getElementById("toast");
+        t.innerHTML = msg;
+        t.className = `fixed bottom-8 right-8 px-8 py-4 rounded-2xl shadow-2xl text-white z-[70] flex items-center gap-4 transition-all transform ${err ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-green-500 to-emerald-600'}`;
+        t.classList.remove("hidden");
+        t.style.animation = 'slideInRight 0.3s ease-out';
+        setTimeout(() => {
+            t.style.animation = 'slideOutRight 0.3s ease-in';
+            setTimeout(() => t.classList.add("hidden"), 300);
+        }, 3000);
+    }
+
+    function fetchCall(action, payload={}, isGet=false) {
+        return new Promise((resolve, reject) => {
+            const url = APP_URL;
+            if(isGet) {
+                const params = new URLSearchParams({action, ...payload}).toString();
+                fetch(url + "?" + params).then(r=>r.json()).then(resolve).catch(reject);
+            } else {
+                fetch(url + "?action=" + action, { method: "POST", body: JSON.stringify(payload) }).then(r=>r.json()).then(resolve).catch(reject);
+            }
+        });
+    }
+  </script>
+  
+  <style>
+    @keyframes slideInRight {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOutRight {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(400px); opacity: 0; }
+    }
+  </style>
+</body>
+</html>
